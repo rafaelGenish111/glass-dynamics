@@ -9,9 +9,24 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
-    folder: 'glass_dynamic_uploads', // folder name in the Cloudinary account
-    allowed_formats: ['jpg', 'png', 'jpeg'],
+  params: async (req, file) => {
+    // זיהוי אוטומטי אם זה PDF או תמונה
+    let format = undefined;
+    let resource_type = 'image';
+
+    if (file.mimetype === 'application/pdf') {
+      format = 'pdf'; // Explicitly set format for PDF
+      // ב-Cloudinary העלאת PDF נחשבת לפעמים כ-image ולפעמים כ-raw, תלוי בהגדרות החשבון.
+      // כברירת מחדל multer-storage-cloudinary מנסה להעלות כ-image.
+    } else {
+      format = file.mimetype.split('/')[1]; // png, jpg etc
+    }
+
+    return {
+      folder: 'glass_dynamic_uploads',
+      format: format,
+      resource_type: 'auto', // נותן ל-Cloudinary להחליט (חשוב ל-PDF)
+    };
   },
 });
 
