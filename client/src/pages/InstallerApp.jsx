@@ -117,27 +117,24 @@ const InstallerApp = () => {
                 <button
                     type="button"
                     onClick={() => setRange('today')}
-                    className={`px-4 py-2 rounded-2xl text-sm font-bold border transition ${
-                        range === 'today' ? 'bg-blue-600 text-white border-blue-500' : 'bg-slate-900 text-slate-300 border-slate-800'
-                    }`}
+                    className={`px-4 py-2 rounded-2xl text-sm font-bold border transition ${range === 'today' ? 'bg-blue-600 text-white border-blue-500' : 'bg-slate-900 text-slate-300 border-slate-800'
+                        }`}
                 >
                     Today
                 </button>
                 <button
                     type="button"
                     onClick={() => setRange('tomorrow')}
-                    className={`px-4 py-2 rounded-2xl text-sm font-bold border transition ${
-                        range === 'tomorrow' ? 'bg-blue-600 text-white border-blue-500' : 'bg-slate-900 text-slate-300 border-slate-800'
-                    }`}
+                    className={`px-4 py-2 rounded-2xl text-sm font-bold border transition ${range === 'tomorrow' ? 'bg-blue-600 text-white border-blue-500' : 'bg-slate-900 text-slate-300 border-slate-800'
+                        }`}
                 >
                     Tomorrow
                 </button>
                 <button
                     type="button"
                     onClick={() => setRange('week')}
-                    className={`px-4 py-2 rounded-2xl text-sm font-bold border transition ${
-                        range === 'week' ? 'bg-blue-600 text-white border-blue-500' : 'bg-slate-900 text-slate-300 border-slate-800'
-                    }`}
+                    className={`px-4 py-2 rounded-2xl text-sm font-bold border transition ${range === 'week' ? 'bg-blue-600 text-white border-blue-500' : 'bg-slate-900 text-slate-300 border-slate-800'
+                        }`}
                 >
                     Next 7 days
                 </button>

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import {
-  ArrowLeft, MapPin, Phone,Mail, Package, FileText, CheckCircle,
+  ArrowLeft, MapPin, Phone, Mail, Package, FileText, CheckCircle,
   Loader, Image as ImageIcon, ArrowRight, RotateCcw,
   FileCheck, UploadCloud, ExternalLink, Lock, MessageSquare
 } from 'lucide-react';
@@ -191,11 +191,11 @@ const ClientCard = () => {
             <p className="text-slate-400 mt-1 flex items-center gap-2"><MapPin size={16} /> {order.clientAddress}</p>
             <p className="text-slate-400 flex items-center gap-2"><Phone size={16} /> {order.clientPhone}</p>
             {order.clientEmail && (
-                        <span className="flex items-center gap-2 hover:text-blue-400 transition cursor-pointer" title="Click to email">
-                            <Mail size={16} className="text-blue-500"/> 
-                            <a href={`mailto:${order.clientEmail}`}>{order.clientEmail}</a>
-                        </span>
-                    )}
+              <span className="flex items-center gap-2 hover:text-blue-400 transition cursor-pointer" title="Click to email">
+                <Mail size={16} className="text-blue-500" />
+                <a href={`mailto:${order.clientEmail}`}>{order.clientEmail}</a>
+              </span>
+            )}
           </div>
           <div className="text-right">
             <div className="text-2xl font-mono text-slate-500">#{order.orderNumber}</div>

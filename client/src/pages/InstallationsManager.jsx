@@ -30,7 +30,7 @@ const InstallationsManager = () => {
 
   // Legacy (kept for backwards compatibility)
   const handleApprove = async (orderId) => {
-    if(!window.confirm(t('approve_close') + '?')) return;
+    if (!window.confirm(t('approve_close') + '?')) return;
     try {
       await axios.post(`${API_URL}/orders/install/approve`, { orderId }, config);
       fetchOrders();
@@ -64,33 +64,30 @@ const InstallationsManager = () => {
         <button
           type="button"
           onClick={() => setActiveBucket('ready_for_install')}
-          className={`px-4 py-2 rounded-xl text-sm font-bold border transition ${
-            activeBucket === 'ready_for_install'
+          className={`px-4 py-2 rounded-xl text-sm font-bold border transition ${activeBucket === 'ready_for_install'
               ? 'bg-slate-800 text-white border-slate-700'
               : 'bg-transparent text-slate-400 border-slate-800 hover:bg-slate-900'
-          }`}
+            }`}
         >
           <span className="inline-flex items-center gap-2"><Clock size={16} /> {t('col_ready')} ({buckets.ready.length})</span>
         </button>
         <button
           type="button"
           onClick={() => setActiveBucket('scheduled')}
-          className={`px-4 py-2 rounded-xl text-sm font-bold border transition ${
-            activeBucket === 'scheduled'
+          className={`px-4 py-2 rounded-xl text-sm font-bold border transition ${activeBucket === 'scheduled'
               ? 'bg-slate-800 text-white border-slate-700'
               : 'bg-transparent text-slate-400 border-slate-800 hover:bg-slate-900'
-          }`}
+            }`}
         >
           <span className="inline-flex items-center gap-2"><Calendar size={16} /> {t('col_scheduled')} ({buckets.scheduled.length})</span>
         </button>
         <button
           type="button"
           onClick={() => setActiveBucket('pending_approval')}
-          className={`px-4 py-2 rounded-xl text-sm font-bold border transition ${
-            activeBucket === 'pending_approval'
+          className={`px-4 py-2 rounded-xl text-sm font-bold border transition ${activeBucket === 'pending_approval'
               ? 'bg-slate-800 text-white border-slate-700'
               : 'bg-transparent text-slate-400 border-slate-800 hover:bg-slate-900'
-          }`}
+            }`}
         >
           <span className="inline-flex items-center gap-2"><CheckCircle size={16} /> {t('col_pending_approval')} ({buckets.pendingApproval.length})</span>
         </button>
@@ -172,10 +169,10 @@ const InstallationsManager = () => {
       </div>
 
       {selectedOrder && (
-        <SchedulingModal 
-          order={selectedOrder} 
-          onClose={() => setSelectedOrder(null)} 
-          onSuccess={fetchOrders} 
+        <SchedulingModal
+          order={selectedOrder}
+          onClose={() => setSelectedOrder(null)}
+          onSuccess={fetchOrders}
         />
       )}
 

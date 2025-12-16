@@ -14,10 +14,10 @@ exports.scheduleInstallation = async (req, res) => {
     order.installDateStart = new Date(startDate);
     order.installDateEnd = new Date(endDate);
     order.installationNotes = notes;
-    
+
     // Move to 'scheduled' bucket
     order.status = 'scheduled';
-    
+
     // Add to timeline
     order.timeline.push({
       status: 'scheduled',
@@ -25,10 +25,10 @@ exports.scheduleInstallation = async (req, res) => {
     });
 
     await order.save();
-    
+
     // Populate installer names for the response
     await order.populate('installers', 'name role');
-    
+
     res.json(order);
   } catch (error) {
     res.status(500).json({ message: error.message });
