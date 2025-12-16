@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { ShoppingCart, CheckCircle, Package } from 'lucide-react';
@@ -10,9 +10,10 @@ const Suppliers = () => {
     const [loading, setLoading] = useState(true);
 
     const user = JSON.parse(localStorage.getItem('userInfo'));
-    const config = { headers: { Authorization: `Bearer ${user.token}` } };
+    const token = user?.token;
+    const config = useMemo(() => ({ headers: { Authorization: `Bearer ${token}` } }), [token]);
 
-    const fetchBatching = async () => {
+    const fetchBatching = useCallback(async () => {
         try {
             // API_URL already includes '/api', so we only append '/orders/...'
             const res = await axios.get(`${API_URL}/orders/batching`, config);
@@ -22,11 +23,12 @@ const Suppliers = () => {
             console.error('Error fetching batching list:', error);
             setLoading(false);
         }
-    };
+    }, [config]);
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     useEffect(() => {
         fetchBatching();
-    }, []);
+    }, [fetchBatching]);
 
     const handleOrderAll = async (supplierName) => {
         if (!window.confirm(`Generate Purchase Order for ${supplierName}?`)) return;

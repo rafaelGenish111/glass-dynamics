@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { Truck, Plus, Trash2, User, Phone, Clock } from 'lucide-react';
@@ -9,16 +9,18 @@ const SupplierManagement = () => {
   const [suppliers, setSuppliers] = useState([]);
   const [formData, setFormData] = useState({ name: '', contactPerson: '', phone: '', leadTime: 7, category: 'Aluminum' });
   const user = JSON.parse(localStorage.getItem('userInfo'));
-  const config = { headers: { Authorization: `Bearer ${user.token}` } };
+  const token = user?.token;
+  const config = useMemo(() => ({ headers: { Authorization: `Bearer ${token}` } }), [token]);
 
-  const fetchSuppliers = async () => {
+  const fetchSuppliers = useCallback(async () => {
     try {
       const res = await axios.get(`${API_URL}/suppliers`, config);
       setSuppliers(res.data);
-    } catch (error) { console.error(error); }
-  };
+    } catch (e) { console.error(e); }
+  }, [config]);
 
-  useEffect(() => { fetchSuppliers(); }, []);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { fetchSuppliers(); }, [fetchSuppliers]);
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -27,7 +29,8 @@ const SupplierManagement = () => {
       alert('Supplier added!');
       setFormData({ name: '', contactPerson: '', phone: '', leadTime: 7, category: 'Aluminum' });
       fetchSuppliers();
-    } catch (error) {
+    } catch (e) {
+      console.error(e);
       alert('Error adding supplier');
     }
   };
@@ -37,7 +40,10 @@ const SupplierManagement = () => {
     try {
       await axios.delete(`${API_URL}/suppliers/${id}`, config);
       fetchSuppliers();
-    } catch (error) { alert('Error deleting'); }
+    } catch (e) {
+      console.error(e);
+      alert('Error deleting');
+    }
   };
 
   // Client-side guard (server also enforces)
