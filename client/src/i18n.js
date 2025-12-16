@@ -162,6 +162,24 @@ const resources = {
             "success": "Action Successful",
             "error": "Error occurred"
         }
+    },
+    es: {
+        translation: {
+            "active_orders": "Pedidos activos",
+            "calendar": "Calendario",
+            "production": "Producción",
+            "customers": "Clientes",
+            "supplier_management": "Gestión de proveedores",
+            "installer_app": "App de instaladores",
+            "admin_panel": "Gestión de usuarios",
+            "logout": "Cerrar sesión",
+
+            "view_master_plan": "Ver plano maestro",
+            "my_tasks": "Mis tareas de hoy",
+            "finish_job": "Finalizar trabajo",
+            "upload_proof": "Foto de prueba",
+            "uploading": "Subiendo..."
+        }
     }
 };
 
@@ -170,7 +188,9 @@ i18n
     .use(initReactI18next)
     .init({
         resources,
-        lng: "en",
+        lng: localStorage.getItem('lang') || "en",
+        fallbackLng: "en",
+        supportedLngs: ["en", "es"],
         interpolation: {
             escapeValue: false
         }

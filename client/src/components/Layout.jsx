@@ -4,12 +4,19 @@ import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { LayoutDashboard, Users, ShoppingCart, Factory, Shield, LogOut, Smartphone, Menu, X, Clock, Truck, Calendar as CalendarIcon, CheckCircle } from 'lucide-react';
 
 const Layout = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const user = JSON.parse(localStorage.getItem('userInfo'));
+
+  const currentLang = (i18n.language || 'en').startsWith('es') ? 'es' : 'en';
+  const toggleLanguage = () => {
+    const next = currentLang === 'en' ? 'es' : 'en';
+    localStorage.setItem('lang', next);
+    i18n.changeLanguage(next);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('userInfo');
@@ -98,9 +105,19 @@ const Layout = () => {
       {/* Mobile Header */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-4 z-40">
         <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">Glass Dynamic</h1>
-        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="text-white p-2">
-          {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={toggleLanguage}
+            className="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-700"
+            title="Change language"
+          >
+            {currentLang === 'en' ? 'ES' : 'EN'}
+          </button>
+          <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="text-white p-2">
+            {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
       {/* Sidebar */}
@@ -143,6 +160,13 @@ const Layout = () => {
         </nav>
 
         <div className="p-4 border-t border-slate-800 pb-20 md:pb-4">
+          <button
+            type="button"
+            onClick={toggleLanguage}
+            className="mb-3 w-full bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-xl text-sm font-bold border border-slate-700"
+          >
+            {currentLang === 'en' ? 'Español' : 'English'}
+          </button>
           <button onClick={handleLogout} className="flex items-center gap-2 text-red-400 hover:text-red-300 text-sm w-full">
             <LogOut size={16} /> {t('logout')}
           </button>
