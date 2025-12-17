@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-import { MapPin, Phone, Camera, CheckCircle, Loader, RefreshCw, FileText } from 'lucide-react';
+import { MapPin, Phone, Camera, CheckCircle, Loader, RefreshCw, FileText, ClipboardList, X, Save } from 'lucide-react';
 import { API_URL } from '../config/api';
 import NoteModal from '../components/NoteModal';
 import MasterPlanPreviewModal from '../components/MasterPlanPreviewModal';
@@ -14,6 +14,9 @@ const InstallerApp = () => {
     const [range, setRange] = useState('today'); // today | tomorrow | week
     const [noteOrderId, setNoteOrderId] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
+    const [takeListJob, setTakeListJob] = useState(null);
+    const [takeListDraft, setTakeListDraft] = useState([]);
+    const [savingTakeList, setSavingTakeList] = useState(false);
 
     const user = JSON.parse(localStorage.getItem('userInfo'));
     const token = user?.token;
@@ -133,6 +136,35 @@ const InstallerApp = () => {
         }
     };
 
+    const openTakeList = (job) => {
+        const list = Array.isArray(job.installTakeList) ? job.installTakeList : [];
+        setTakeListJob(job);
+        setTakeListDraft(list);
+    };
+
+    const closeTakeList = () => {
+        setTakeListJob(null);
+        setTakeListDraft([]);
+        setSavingTakeList(false);
+    };
+
+    const saveTakeList = async () => {
+        if (!takeListJob) return;
+        setSavingTakeList(true);
+        try {
+            await axios.put(`${API_URL}/orders/${takeListJob._id}/install-take-list`, {
+                installTakeList: takeListDraft
+            }, config);
+            setSavingTakeList(false);
+            closeTakeList();
+            fetchJobs();
+        } catch (e) {
+            console.error(e);
+            setSavingTakeList(false);
+            alert('Error saving checklist');
+        }
+    };
+
     return (
         <div className="min-h-screen bg-slate-950 text-slate-100 p-4 pb-20">
             <div className="flex justify-between items-center mb-6">
@@ -210,7 +242,7 @@ const InstallerApp = () => {
                                 )}
 
                                 <a
-                                    href={`https://waze.com/ul?q=${job.clientAddress}`}
+                                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(job.clientAddress || '')}`}
                                     target="_blank" rel="noreferrer"
                                     className="text-blue-400 text-sm mb-6 flex items-center gap-2 underline underline-offset-4"
                                 >
@@ -219,11 +251,11 @@ const InstallerApp = () => {
 
                                 <div className="grid grid-cols-2 gap-3 mb-6">
                                     <a
-                                        href={`https://waze.com/ul?q=${job.clientAddress}`}
+                                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(job.clientAddress || '')}`}
                                         target="_blank" rel="noreferrer"
                                         className="bg-slate-800 hover:bg-slate-700 text-blue-400 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition active:scale-95 border border-slate-700"
                                     >
-                                        <MapPin /> Waze
+                                        <MapPin /> Google Maps
                                     </a>
                                     <a
                                         href={`tel:${job.clientPhone}`}
@@ -232,6 +264,17 @@ const InstallerApp = () => {
                                         <Phone /> Call
                                     </a>
                                 </div>
+
+                                {/* Installation checklist (collapsed -> modal) */}
+                                {job.__type !== 'repair' && Array.isArray(job.installTakeList) && job.installTakeList.length > 0 && (
+                                    <button
+                                        type="button"
+                                        onClick={() => openTakeList(job)}
+                                        className="w-full mb-4 bg-slate-800 hover:bg-slate-700 text-white py-3 rounded-2xl font-bold text-sm border border-slate-700 inline-flex items-center justify-center gap-2"
+                                    >
+                                        <ClipboardList size={18} /> Installation checklist
+                                    </button>
+                                )}
 
                                 {/* Existing Photos Gallery */}
                                 {job.files && job.files.filter(f => f.type !== 'master_plan').length > 0 && (
@@ -291,6 +334,57 @@ const InstallerApp = () => {
                     title="Master plan"
                     onClose={() => setPreviewUrl('')}
                 />
+            )}
+
+            {takeListJob && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                    <div className="bg-slate-900 w-full max-w-lg rounded-2xl border border-slate-700 shadow-2xl">
+                        <div className="p-5 border-b border-slate-800 flex justify-between items-center">
+                            <div>
+                                <h3 className="text-lg font-bold text-white">Installation checklist</h3>
+                                <p className="text-xs text-slate-400 mt-1">{takeListJob.clientName}</p>
+                            </div>
+                            <button type="button" onClick={closeTakeList} className="text-slate-400 hover:text-white">
+                                <X />
+                            </button>
+                        </div>
+
+                        <div className="p-5 space-y-2 max-h-[60vh] overflow-y-auto">
+                            {takeListDraft.length === 0 ? (
+                                <div className="text-slate-500 text-sm">No checklist items.</div>
+                            ) : (
+                                takeListDraft.map((it, idx) => (
+                                    <label key={`${it.label}-${idx}`} className="flex items-center gap-3 bg-slate-950/40 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200">
+                                        <input
+                                            type="checkbox"
+                                            className="accent-emerald-500"
+                                            checked={Boolean(it.done)}
+                                            onChange={(e) => {
+                                                const checked = e.target.checked;
+                                                setTakeListDraft((prev) => prev.map((p, i) => (i === idx ? { ...p, done: checked } : p)));
+                                            }}
+                                        />
+                                        <span className={it.done ? 'line-through text-slate-500' : ''}>{it.label}</span>
+                                    </label>
+                                ))
+                            )}
+                        </div>
+
+                        <div className="p-5 border-t border-slate-800 flex justify-end gap-3">
+                            <button type="button" onClick={closeTakeList} className="px-4 py-2 text-slate-400 hover:text-white">
+                                Close
+                            </button>
+                            <button
+                                type="button"
+                                onClick={saveTakeList}
+                                disabled={savingTakeList}
+                                className="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-xl font-bold inline-flex items-center gap-2"
+                            >
+                                <Save size={18} /> {savingTakeList ? 'Saving...' : 'Save'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

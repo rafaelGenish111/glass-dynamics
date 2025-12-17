@@ -106,7 +106,7 @@ const CustomerProfile = () => {
                 <div className="bg-emerald-500/20 p-2 rounded-lg text-emerald-400"><MapPin size={18} /></div>
                 <div>
                   <p className="text-xs text-slate-500">Address</p>
-                  <a href={`https://waze.com/ul?q=${clientDetails.clientAddress}`} target="_blank" rel="noreferrer" className="text-slate-200 hover:text-white font-medium truncate max-w-[180px] block">
+                  <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(clientDetails.clientAddress || '')}`} target="_blank" rel="noreferrer" className="text-slate-200 hover:text-white font-medium truncate max-w-[180px] block">
                     {clientDetails.clientAddress || 'N/A'}
                   </a>
                 </div>
