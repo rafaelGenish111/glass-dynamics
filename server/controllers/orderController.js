@@ -52,6 +52,18 @@ exports.createOrder = async (req, res) => {
       hardware: materials.some(m => m.materialType === 'Hardware') ? 'pending' : 'not_needed',
     };
 
+    // Production checklist defaults:
+    // - If the order has no relevant items for a category, mark it Done by default.
+    // - Otherwise, it starts as Not done.
+    const hasGlass = materials.some((m) => m.materialType === 'Glass');
+    const hasPaint = materials.some((m) => m.materialType === 'Paint');
+    const hasMaterials = materials.some((m) => ['Aluminum', 'Hardware', 'Other'].includes(m.materialType));
+    const productionChecklist = {
+      glassDone: hasGlass ? false : true,
+      paintDone: hasPaint ? false : true,
+      materialsDone: hasMaterials ? false : true
+    };
+
     // Determine initial status: if materials needed -> materials_pending, else -> production
     const initialStatus = materials.length > 0 ? 'materials_pending' : 'production';
 
@@ -66,6 +78,8 @@ exports.createOrder = async (req, res) => {
       products,   // Client items (Window, Door...)
       materials,  // Factory items (Glass, Paint...)
       productionStatus: prodStatus,
+      productionChecklist,
+      productionNote: '',
       status: initialStatus,
       timeline: [{ status: 'created', note: 'Order created', date: new Date(), user: req.user ? req.user.name : 'System' }]
     });
@@ -74,6 +88,115 @@ exports.createOrder = async (req, res) => {
     res.status(201).json(createdOrder);
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+};
+
+// --- PRODUCTION (DONE / NOT DONE) ---
+exports.updateProduction = async (req, res) => {
+  const { productionChecklist, productionNote } = req.body;
+  const userName = req.user ? req.user.name : 'System';
+
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    if (productionChecklist && typeof productionChecklist === 'object') {
+      order.productionChecklist = {
+        ...(order.productionChecklist || {}),
+        ...productionChecklist
+      };
+    }
+
+    if (typeof productionNote === 'string') {
+      order.productionNote = productionNote;
+    }
+
+    order.timeline.push({
+      status: order.status,
+      note: 'Production updated',
+      date: new Date(),
+      user: userName
+    });
+
+    const saved = await order.save();
+    res.json(saved);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.updateInstallTakeList = async (req, res) => {
+  const { installTakeList } = req.body;
+  const userName = req.user ? req.user.name : 'System';
+
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    const list = Array.isArray(installTakeList) ? installTakeList : [];
+    const normalized = list
+      .map((it) => ({
+        label: typeof it?.label === 'string' ? it.label.trim() : '',
+        done: Boolean(it?.done)
+      }))
+      .filter((it) => it.label.length > 0)
+      .slice(0, 50);
+
+    order.installTakeList = normalized;
+    order.timeline.push({
+      status: order.status,
+      note: 'Installation checklist updated',
+      date: new Date(),
+      user: userName
+    });
+    const saved = await order.save();
+    res.json(saved);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.updateOrderIssue = async (req, res) => {
+  const { isIssue, reason } = req.body;
+  const userName = req.user ? req.user.name : 'System';
+
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    const nextIsIssue = Boolean(isIssue);
+    if (nextIsIssue) {
+      order.issue = {
+        isIssue: true,
+        reason: typeof reason === 'string' ? reason.trim() : '',
+        createdAt: new Date(),
+        createdBy: userName,
+        resolvedAt: null
+      };
+      order.timeline.push({
+        status: order.status,
+        note: `Marked as issue${order.issue.reason ? `: ${order.issue.reason}` : ''}`,
+        date: new Date(),
+        user: userName
+      });
+    } else {
+      order.issue = {
+        ...(order.issue || {}),
+        isIssue: false,
+        resolvedAt: new Date()
+      };
+      order.timeline.push({
+        status: order.status,
+        note: 'Issue resolved',
+        date: new Date(),
+        user: userName
+      });
+    }
+
+    const saved = await order.save();
+    res.json(saved);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 

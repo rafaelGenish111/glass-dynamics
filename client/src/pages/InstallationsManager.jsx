@@ -1,21 +1,25 @@
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-import { Truck, Calendar, CheckCircle, Clock, FileText } from 'lucide-react';
+import { Truck, Calendar, CheckCircle, Clock, FileText, AlertTriangle, Search } from 'lucide-react';
 import SchedulingModal from '../components/SchedulingModal';
 import { API_URL } from '../config/api';
 import NoteModal from '../components/NoteModal';
 import { useNavigate } from 'react-router-dom';
 import MasterPlanPreviewModal from '../components/MasterPlanPreviewModal';
+import RepairSchedulingModal from '../components/RepairSchedulingModal';
 
 const InstallationsManager = () => {
   const { t } = useTranslation();
   const [orders, setOrders] = useState([]);
+  const [repairs, setRepairs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedRepair, setSelectedRepair] = useState(null);
   const [activeBucket, setActiveBucket] = useState('ready_for_install');
   const [noteOrderId, setNoteOrderId] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
+  const [query, setQuery] = useState('');
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('userInfo'));
   const token = user?.token;
@@ -24,8 +28,12 @@ const InstallationsManager = () => {
 
   const fetchOrders = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_URL}/orders`, config);
-      setOrders(res.data);
+      const [ordersRes, repairsRes] = await Promise.all([
+        axios.get(`${API_URL}/orders`, config),
+        axios.get(`${API_URL}/repairs`, config)
+      ]);
+      setOrders(ordersRes.data);
+      setRepairs(repairsRes.data);
       setLoading(false);
     } catch (error) { console.error(error); setLoading(false); }
   }, [config]);
@@ -42,17 +50,73 @@ const InstallationsManager = () => {
   // Approvals are handled in /approvals
 
   const buckets = useMemo(() => {
-    const ready = orders.filter(o => o.status === 'ready_for_install');
-    const scheduled = orders.filter(o => o.status === 'scheduled');
-    const pendingApproval = orders.filter(o => o.status === 'pending_approval');
+    const readyOrders = orders.filter(o => o.status === 'ready_for_install').map((o) => ({ ...o, __type: 'order' }));
+    const scheduledOrders = orders.filter(o => o.status === 'scheduled').map((o) => ({ ...o, __type: 'order' }));
+    const pendingApproval = orders.filter(o => o.status === 'pending_approval').map((o) => ({ ...o, __type: 'order' }));
+
+    const readyRepairs = repairs.filter((r) => r.status === 'ready_to_schedule').map((r) => ({ ...r, __type: 'repair' }));
+    const scheduledRepairs = repairs.filter((r) => r.status === 'scheduled').map((r) => ({ ...r, __type: 'repair' }));
+
+    const ready = [...readyOrders, ...readyRepairs];
+    const scheduled = [...scheduledOrders, ...scheduledRepairs];
     return { ready, scheduled, pendingApproval };
-  }, [orders]);
+  }, [orders, repairs]);
 
   const rows = useMemo(() => {
     if (activeBucket === 'scheduled') return buckets.scheduled;
     if (activeBucket === 'pending_approval') return buckets.pendingApproval;
     return buckets.ready;
   }, [activeBucket, buckets]);
+
+  const filteredRows = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return rows;
+    return rows.filter((o) => {
+      const num = String(o.manualOrderNumber || o.orderNumber || o._id || '').toLowerCase();
+      const name = String(o.clientName || '').toLowerCase();
+      return num.includes(q) || name.includes(q);
+    });
+  }, [query, rows]);
+
+  const isOverdue = useCallback((order) => {
+    if (!order) return false;
+    if (order.status !== 'scheduled') return false;
+    const end = order.installDateEnd ? new Date(order.installDateEnd) : null;
+    const start = order.installDateStart ? new Date(order.installDateStart) : null;
+    const now = new Date();
+    const deadline = end && !Number.isNaN(end.getTime()) ? end : start;
+    if (!deadline || Number.isNaN(deadline.getTime())) return false;
+    return deadline.getTime() < now.getTime();
+  }, []);
+
+  const markIssue = async (order) => {
+    const reason = window.prompt('Issue reason (will be visible in scheduling):', order?.issue?.reason || '');
+    if (reason === null) return;
+    try {
+      const url = order.__type === 'repair'
+        ? `${API_URL}/repairs/${order._id}/issue`
+        : `${API_URL}/orders/${order._id}/issue`;
+      await axios.put(url, { isIssue: true, reason }, config);
+      fetchOrders();
+    } catch (e) {
+      console.error(e);
+      alert('Error updating issue');
+    }
+  };
+
+  const resolveIssue = async (order) => {
+    if (!window.confirm('Resolve this issue?')) return;
+    try {
+      const url = order.__type === 'repair'
+        ? `${API_URL}/repairs/${order._id}/issue`
+        : `${API_URL}/orders/${order._id}/issue`;
+      await axios.put(url, { isIssue: false }, config);
+      fetchOrders();
+    } catch (e) {
+      console.error(e);
+      alert('Error updating issue');
+    }
+  };
 
   return (
     <div className="h-[calc(100vh-100px)] flex flex-col">
@@ -67,6 +131,19 @@ const InstallationsManager = () => {
         >
           Refresh
         </button>
+      </div>
+
+      <div className="mb-4">
+        <div className="relative max-w-md">
+          <Search size={16} className="absolute left-3 top-3 text-slate-500" />
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search by client or order #"
+            className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-sm text-white placeholder:text-slate-500"
+          />
+        </div>
       </div>
 
       {/* Bucket switch */}
@@ -111,8 +188,8 @@ const InstallationsManager = () => {
               <th className="p-4">Order #</th>
               <th className="p-4">Client</th>
               <th className="p-4">Work days</th>
-              <th className="p-4">Deposit paid</th>
               <th className="p-4">Deposit date</th>
+              <th className="p-4">Scheduled date</th>
               <th className="p-4">Region</th>
               <th className="p-4">Action</th>
             </tr>
@@ -120,22 +197,47 @@ const InstallationsManager = () => {
           <tbody className="divide-y divide-slate-800">
             {loading ? (
               <tr><td colSpan="7" className="p-8 text-center text-slate-400">Loading...</td></tr>
-            ) : rows.length === 0 ? (
+            ) : filteredRows.length === 0 ? (
               <tr><td colSpan="7" className="p-8 text-center text-slate-500">No orders in this stage.</td></tr>
             ) : (
-              rows.map((order) => {
+              filteredRows.map((order) => {
                 const displayOrderNumber = order.manualOrderNumber || order.orderNumber || order._id;
-                const depositPaid = Boolean(order.depositPaid);
                 const depositPaidAt = order.depositPaidAt ? new Date(order.depositPaidAt).toLocaleDateString() : '—';
-                const masterPlan = order.files && order.files.find((f) => f.type === 'master_plan');
+                const scheduledAt = order.installDateStart ? new Date(order.installDateStart).toLocaleDateString() : '—';
+                const masterPlan = order.__type === 'order' ? (order.files && order.files.find((f) => f.type === 'master_plan')) : null;
+                const hasIssue = Boolean(order.issue?.isIssue);
+                const overdue = isOverdue(order);
+                const rowDanger = hasIssue || overdue;
+                const isRepair = order.__type === 'repair';
 
                 return (
-                  <tr key={order._id} className="hover:bg-slate-800/30 transition">
-                    <td className="p-4 font-mono text-blue-400">#{displayOrderNumber}</td>
+                  <tr
+                    key={order._id}
+                    className={`transition ${rowDanger ? 'bg-red-950/30 hover:bg-red-950/40' : 'hover:bg-slate-800/30'}`}
+                  >
+                    <td className="p-4 font-mono text-blue-400">
+                      <div className="flex items-center gap-2">
+                        #{displayOrderNumber}
+                        {isRepair && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-800/40 bg-amber-900/20 text-amber-200">
+                            REPAIR
+                          </span>
+                        )}
+                        {(hasIssue || overdue) && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border border-red-900/40 bg-red-900/20 text-red-200">
+                            <AlertTriangle size={12} />
+                            {hasIssue ? 'ISSUE' : 'OVERDUE'}
+                          </span>
+                        )}
+                      </div>
+                      {hasIssue && order.issue?.reason && (
+                        <div className="text-xs text-red-200/80 mt-1">Reason: {order.issue.reason}</div>
+                      )}
+                    </td>
                     <td className="p-4 font-semibold text-white">{order.clientName}</td>
-                    <td className="p-4">{order.estimatedInstallationDays ?? 1}</td>
-                    <td className="p-4">{depositPaid ? 'Yes' : 'No'}</td>
-                    <td className="p-4">{depositPaid ? depositPaidAt : '—'}</td>
+                    <td className="p-4">{isRepair ? (order.estimatedWorkDays ?? 1) : (order.estimatedInstallationDays ?? 1)}</td>
+                    <td className="p-4">{depositPaidAt}</td>
+                    <td className="p-4">{activeBucket === 'scheduled' ? scheduledAt : '—'}</td>
                     <td className="p-4">{order.region || '—'}</td>
                     <td className="p-4">
                       {activeBucket === 'ready_for_install' && (
@@ -151,18 +253,23 @@ const InstallationsManager = () => {
                           )}
                           <button
                             type="button"
-                            onClick={() => setSelectedOrder(order)}
+                            onClick={() => {
+                              if (isRepair) setSelectedRepair(order);
+                              else setSelectedOrder(order);
+                            }}
                             className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold"
                           >
-                            {t('schedule_job')}
+                            {isRepair ? 'Schedule repair' : t('schedule_job')}
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => setNoteOrderId(order._id)}
-                            className="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-700"
-                          >
-                            Add note
-                          </button>
+                          {!isRepair && (
+                            <button
+                              type="button"
+                              onClick={() => setNoteOrderId(order._id)}
+                              className="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-700"
+                            >
+                              Add note
+                            </button>
+                          )}
                         </div>
                       )}
 
@@ -198,6 +305,23 @@ const InstallationsManager = () => {
                               <FileText size={14} /> Plan
                             </button>
                           )}
+                          {hasIssue ? (
+                            <button
+                              type="button"
+                              onClick={() => resolveIssue(order)}
+                              className="bg-red-900/30 hover:bg-red-900/40 text-red-100 px-3 py-1.5 rounded-lg text-xs font-bold border border-red-900/40"
+                            >
+                              Resolve issue
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => markIssue(order)}
+                              className="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-700"
+                            >
+                              Mark issue
+                            </button>
+                          )}
                           <span className="text-slate-500 text-xs">Scheduled</span>
                         </div>
                       )}
@@ -214,6 +338,14 @@ const InstallationsManager = () => {
         <SchedulingModal
           order={selectedOrder}
           onClose={() => setSelectedOrder(null)}
+          onSuccess={fetchOrders}
+        />
+      )}
+
+      {selectedRepair && (
+        <RepairSchedulingModal
+          repair={selectedRepair}
+          onClose={() => setSelectedRepair(null)}
           onSuccess={fetchOrders}
         />
       )}

@@ -1,15 +1,15 @@
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-import { Hammer, CheckCircle, FileText, ExternalLink, Play } from 'lucide-react';
+import { Hammer, CheckCircle, Save } from 'lucide-react';
 import { API_URL } from '../config/api';
-import NoteModal from '../components/NoteModal';
 
 const Production = () => {
     const { t } = useTranslation();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [noteOrderId, setNoteOrderId] = useState(null);
+    const [draftNotes, setDraftNotes] = useState({});
+    const [savingId, setSavingId] = useState(null);
     const user = JSON.parse(localStorage.getItem('userInfo'));
     const token = user?.token;
     const config = useMemo(() => ({ headers: { Authorization: `Bearer ${token}` } }), [token]);
@@ -37,17 +37,6 @@ const Production = () => {
         return () => clearInterval(id);
     }, [fetchProductionOrders]);
 
-    const startProduction = async (orderId) => {
-        if (!window.confirm('Start production for this order?')) return;
-        try {
-            await axios.put(`${API_URL}/orders/${orderId}/status`, { status: 'in_production' }, config);
-            fetchProductionOrders();
-        } catch (e) {
-            console.error(e);
-            alert('Error updating status');
-        }
-    };
-
     const finishProduction = async (orderId) => {
         if (!window.confirm('Finish production and send to scheduling?')) return;
         try {
@@ -59,12 +48,40 @@ const Production = () => {
         }
     };
 
-    const computeStatus = (order, materialTypes) => {
+    const isRelevant = (order, types) => {
         const materials = Array.isArray(order.materials) ? order.materials : [];
-        const relevant = materials.filter((m) => materialTypes.includes(m.materialType));
-        if (relevant.length === 0) return 'Not relevant';
-        const allArrived = relevant.every((m) => m.isArrived);
-        return allArrived ? 'Waiting for installation' : 'Waiting for materials';
+        return materials.some((m) => types.includes(m.materialType));
+    };
+
+    const getChecklistValue = (order, key, relevant) => {
+        const v = order?.productionChecklist?.[key];
+        if (typeof v === 'boolean') return v;
+        // Auto-Done if not relevant
+        return relevant ? false : true;
+    };
+
+    const updateChecklist = async (order, patch) => {
+        try {
+            await axios.put(`${API_URL}/orders/${order._id}/production`, { productionChecklist: patch }, config);
+            fetchProductionOrders();
+        } catch (e) {
+            console.error(e);
+            alert('Error saving production status');
+        }
+    };
+
+    const saveProductionNote = async (order) => {
+        const text = (draftNotes[order._id] ?? order.productionNote ?? '').trimEnd();
+        setSavingId(order._id);
+        try {
+            await axios.put(`${API_URL}/orders/${order._id}/production`, { productionNote: text }, config);
+            setSavingId(null);
+            fetchProductionOrders();
+        } catch (e) {
+            console.error(e);
+            setSavingId(null);
+            alert('Error saving note');
+        }
     };
 
     return (
@@ -99,62 +116,103 @@ const Production = () => {
                                 <th className="p-4">Glass</th>
                                 <th className="p-4">Paint</th>
                                 <th className="p-4">Materials</th>
-                                <th className="p-4">Plan</th>
+                                <th className="p-4">Production note</th>
                                 <th className="p-4">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-800">
                             {orders.map((order) => {
-                                const masterPlan = order.files && order.files.find((f) => f.type === 'master_plan');
                                 const displayOrderNumber = order.manualOrderNumber || order.orderNumber || order._id;
 
-                                const glassStatus = computeStatus(order, ['Glass']);
-                                const paintStatus = computeStatus(order, ['Paint']);
-                                const materialsStatus = computeStatus(order, ['Aluminum', 'Hardware', 'Other']);
+                                const glassRelevant = isRelevant(order, ['Glass']);
+                                const paintRelevant = isRelevant(order, ['Paint']);
+                                const materialsRelevant = isRelevant(order, ['Aluminum', 'Hardware', 'Other']);
+
+                                const glassDone = getChecklistValue(order, 'glassDone', glassRelevant);
+                                const paintDone = getChecklistValue(order, 'paintDone', paintRelevant);
+                                const materialsDone = getChecklistValue(order, 'materialsDone', materialsRelevant);
+
+                                const canReady = Boolean(glassDone && paintDone && materialsDone);
+                                const currentNote = draftNotes[order._id] ?? (order.productionNote || '');
 
                                 return (
                                     <tr key={order._id} className="hover:bg-slate-800/30 transition">
                                         <td className="p-4 font-mono text-amber-400">#{displayOrderNumber}</td>
                                         <td className="p-4 font-semibold text-white">{order.clientName}</td>
-                                        <td className="p-4">{glassStatus}</td>
-                                        <td className="p-4">{paintStatus}</td>
-                                        <td className="p-4">{materialsStatus}</td>
                                         <td className="p-4">
-                                            {masterPlan ? (
-                                                <a
-                                                    href={masterPlan.url}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    className="inline-flex items-center gap-1 text-indigo-300 hover:text-indigo-200"
+                                            <button
+                                                type="button"
+                                                onClick={() => updateChecklist(order, { glassDone: !glassDone })}
+                                                className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition ${glassDone
+                                                    ? 'bg-emerald-600/20 text-emerald-200 border-emerald-700'
+                                                    : 'bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800'
+                                                    }`}
+                                                title={glassRelevant ? '' : 'Auto-done (not relevant)'}
+                                            >
+                                                {glassDone ? 'Done' : 'Not done'}
+                                            </button>
+                                        </td>
+                                        <td className="p-4">
+                                            <button
+                                                type="button"
+                                                onClick={() => updateChecklist(order, { paintDone: !paintDone })}
+                                                className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition ${paintDone
+                                                    ? 'bg-emerald-600/20 text-emerald-200 border-emerald-700'
+                                                    : 'bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800'
+                                                    }`}
+                                                title={paintRelevant ? '' : 'Auto-done (not relevant)'}
+                                            >
+                                                {paintDone ? 'Done' : 'Not done'}
+                                            </button>
+                                        </td>
+                                        <td className="p-4">
+                                            <button
+                                                type="button"
+                                                onClick={() => updateChecklist(order, { materialsDone: !materialsDone })}
+                                                className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition ${materialsDone
+                                                    ? 'bg-emerald-600/20 text-emerald-200 border-emerald-700'
+                                                    : 'bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800'
+                                                    }`}
+                                                title={materialsRelevant ? '' : 'Auto-done (not relevant)'}
+                                            >
+                                                {materialsDone ? 'Done' : 'Not done'}
+                                            </button>
+                                        </td>
+                                        <td className="p-4">
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="text"
+                                                    value={currentNote}
+                                                    onChange={(e) => setDraftNotes((prev) => ({ ...prev, [order._id]: e.target.value }))}
+                                                    placeholder="Production note..."
+                                                    className="w-full min-w-[220px] bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-slate-600"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => saveProductionNote(order)}
+                                                    disabled={savingId === order._id}
+                                                    className="bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white px-3 py-2 rounded-lg text-xs font-bold border border-slate-700 inline-flex items-center gap-1"
+                                                    title="Save note"
                                                 >
-                                                    <FileText size={14} /> View <ExternalLink size={12} />
-                                                </a>
-                                            ) : (
-                                                <span className="text-slate-600">—</span>
-                                            )}
+                                                    <Save size={14} /> Save
+                                                </button>
+                                            </div>
                                         </td>
                                         <td className="p-4">
                                             <div className="flex flex-wrap gap-2">
-                                                {order.status !== 'in_production' && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => startProduction(order._id)}
-                                                        className="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold inline-flex items-center gap-1 border border-slate-700"
-                                                    >
-                                                        <Play size={14} /> Start
-                                                    </button>
-                                                )}
                                                 <button
                                                     type="button"
-                                                    onClick={() => setNoteOrderId(order._id)}
-                                                    className="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-700"
-                                                >
-                                                    Add note
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => finishProduction(order._id)}
-                                                    className="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold inline-flex items-center gap-1"
+                                                    onClick={() => {
+                                                        if (!canReady) {
+                                                            alert('Please mark Glass, Paint, and Materials as Done before sending to scheduling.');
+                                                            return;
+                                                        }
+                                                        finishProduction(order._id);
+                                                    }}
+                                                    className={`text-white px-3 py-1.5 rounded-lg text-xs font-bold inline-flex items-center gap-1 ${canReady
+                                                        ? 'bg-emerald-600 hover:bg-emerald-500'
+                                                        : 'bg-slate-700 cursor-not-allowed opacity-60'
+                                                        }`}
                                                 >
                                                     <CheckCircle size={14} /> Ready for scheduling
                                                 </button>
@@ -166,15 +224,6 @@ const Production = () => {
                         </tbody>
                     </table>
                 </div>
-            )}
-
-            {noteOrderId && (
-                <NoteModal
-                    orderId={noteOrderId}
-                    stage="production"
-                    onClose={() => setNoteOrderId(null)}
-                    onSaved={fetchProductionOrders}
-                />
             )}
         </div>
     );

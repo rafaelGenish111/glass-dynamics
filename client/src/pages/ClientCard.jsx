@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft, MapPin, Phone, Mail, Package, FileText, CheckCircle,
   Loader, Image as ImageIcon,
-  FileCheck, UploadCloud, ExternalLink, MessageSquare
+  FileCheck, UploadCloud, ExternalLink, MessageSquare, ClipboardList, Plus, Trash2, Save
 } from 'lucide-react';
 import { API_URL } from '../config/api';
 
@@ -19,6 +19,9 @@ const ClientCard = () => {
   const [uploadingType, setUploadingType] = useState(null);
   const [noteText, setNoteText] = useState('');
   const [noteStage, setNoteStage] = useState('general');
+  const [takeListDraft, setTakeListDraft] = useState([]);
+  const [newTakeItem, setNewTakeItem] = useState('');
+  const [savingTakeList, setSavingTakeList] = useState(false);
   const user = JSON.parse(localStorage.getItem('userInfo'));
   const token = user?.token;
   const config = useMemo(() => ({ headers: { Authorization: `Bearer ${token}` } }), [token]);
@@ -39,6 +42,18 @@ const ClientCard = () => {
     fetchOrder();
   }, [fetchOrder]);
 
+  useEffect(() => {
+    if (!order) return;
+    const existing = Array.isArray(order.installTakeList) ? order.installTakeList : [];
+    if (existing.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setTakeListDraft(existing);
+      return;
+    }
+    // Start empty – user adds items as needed
+    setTakeListDraft([]);
+  }, [order]);
+
   const addNote = async () => {
     if (!noteText.trim()) return;
     try {
@@ -49,6 +64,19 @@ const ClientCard = () => {
     } catch (e) {
       console.error(e);
       alert('Error saving note');
+    }
+  };
+
+  const saveTakeList = async () => {
+    setSavingTakeList(true);
+    try {
+      await axios.put(`${API_URL}/orders/${id}/install-take-list`, { installTakeList: takeListDraft }, config);
+      setSavingTakeList(false);
+      fetchOrder();
+    } catch (e) {
+      console.error(e);
+      setSavingTakeList(false);
+      alert('Error saving installation checklist');
     }
   };
 
@@ -331,6 +359,72 @@ const ClientCard = () => {
             )}
             <input type="file" className="hidden" onChange={(e) => handleFileUpload(e, 'document')} disabled={!!uploadingType} />
           </label>
+        </div>
+
+        {/* What to take to installation */}
+        <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6 shadow-lg">
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <h3 className="font-bold flex items-center gap-2 text-lg">
+              <ClipboardList className="text-emerald-400" /> What to take to installation
+            </h3>
+            <button
+              type="button"
+              onClick={saveTakeList}
+              disabled={savingTakeList}
+              className="bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white px-4 py-2 rounded-xl text-sm font-bold border border-slate-700 inline-flex items-center gap-2"
+            >
+              <Save size={16} /> {savingTakeList ? 'Saving...' : 'Save'}
+            </button>
+          </div>
+
+          <div className="space-y-2">
+            {takeListDraft.map((it, idx) => (
+              <div key={`${it.label}-${idx}`} className="flex items-center justify-between gap-3 bg-slate-950/40 border border-slate-800 rounded-xl px-3 py-2">
+                <label className="flex items-center gap-3 text-sm text-slate-200 w-full">
+                  <input
+                    type="checkbox"
+                    className="accent-emerald-500"
+                    checked={Boolean(it.done)}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setTakeListDraft((prev) => prev.map((p, i) => (i === idx ? { ...p, done: checked } : p)));
+                    }}
+                  />
+                  <span className={it.done ? 'line-through text-slate-500' : ''}>{it.label}</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setTakeListDraft((prev) => prev.filter((_, i) => i !== idx))}
+                  className="text-slate-500 hover:text-red-400"
+                  title="Remove"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 flex gap-2">
+            <input
+              type="text"
+              value={newTakeItem}
+              onChange={(e) => setNewTakeItem(e.target.value)}
+              placeholder="Add item..."
+              className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-white placeholder:text-slate-500"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                const label = newTakeItem.trim();
+                if (!label) return;
+                setTakeListDraft((prev) => [...prev, { label, done: false }]);
+                setNewTakeItem('');
+              }}
+              className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl font-bold inline-flex items-center gap-2"
+            >
+              <Plus size={16} /> Add
+            </button>
+          </div>
         </div>
 
       </div>

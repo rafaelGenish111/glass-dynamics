@@ -75,6 +75,15 @@ const OrderSchema = new mongoose.Schema({
     other: { type: String, enum: ['not_needed', 'pending', 'arrived'], default: 'not_needed' }
   },
 
+  // --- Production Checklist (Done/Not done) ---
+  // This is independent from material arrival and is used by the factory to confirm work completion.
+  productionChecklist: {
+    glassDone: { type: Boolean },
+    paintDone: { type: Boolean },
+    materialsDone: { type: Boolean }
+  },
+  productionNote: { type: String, default: '' },
+
   // --- Finance & Time Estimation ---
   estimatedInstallationDays: { type: Number, default: 1 },
   deposit: { type: Number, default: 0 }, // Down payment
@@ -103,6 +112,21 @@ const OrderSchema = new mongoose.Schema({
   installDateStart: { type: Date },
   installDateEnd: { type: Date },
   installationNotes: { type: String },
+
+  // --- Installation Prep Checklist (What to take to site) ---
+  installTakeList: [{
+    label: { type: String, required: true },
+    done: { type: Boolean, default: false }
+  }],
+
+  // --- Issues / Delays (Scheduling) ---
+  issue: {
+    isIssue: { type: Boolean, default: false },
+    reason: { type: String, default: '' },
+    createdAt: { type: Date },
+    createdBy: { type: String },
+    resolvedAt: { type: Date }
+  },
 
   // --- Notes (by stage, by user) ---
   notes: [{

@@ -6,7 +6,10 @@ const {
     getBatchingList, markAsOrdered,
     getCustomers, getClientHistory, getClientByPhone, getOrderById, addOrderFile, searchClients, getPendingMaterials, markMaterialOrdered, getPurchasingStatus, toggleMaterialArrival,
     updateFinalInvoice,
-    addOrderNote
+    addOrderNote,
+    updateProduction,
+    updateInstallTakeList,
+    updateOrderIssue
 } = require('../controllers/orderController');
 
 // Import NEW Install Controller
@@ -44,6 +47,9 @@ router.post('/install/approve', protect, authorize('super_admin', 'admin'), appr
 // פעולות לפי מזהה הזמנה (must stay after fixed routes)
 router.post('/', protect, authorize('super_admin', 'admin', 'office'), createOrder);
 router.put('/:id/status', protect, updateOrderStatus);
+router.put('/:id/production', protect, authorize('super_admin', 'admin', 'production'), updateProduction);
+router.put('/:id/install-take-list', protect, authorize('super_admin', 'admin', 'office', 'production', 'installer'), updateInstallTakeList);
+router.put('/:id/issue', protect, authorize('super_admin', 'admin', 'office'), updateOrderIssue);
 router.put('/:id/final-invoice', protect, authorize('super_admin', 'admin', 'office'), updateFinalInvoice);
 router.post('/:id/notes', protect, addOrderNote);
 router.put('/:id/files', protect, addOrderFile);

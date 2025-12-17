@@ -21,16 +21,26 @@ const CalendarView = () => {
 
     const fetchOrders = useCallback(async () => {
         try {
-            const res = await axios.get(`${API_URL}/orders`, config);
-            let relevantOrders = res.data;
+            const [ordersRes, repairsRes] = await Promise.all([
+                axios.get(`${API_URL}/orders`, config),
+                axios.get(`${API_URL}/repairs`, config)
+            ]);
+
+            let relevantOrders = ordersRes.data;
+            let relevantRepairs = repairsRes.data;
 
             if (isRestricted) {
-                relevantOrders = res.data.filter((order) => {
+                relevantOrders = ordersRes.data.filter((order) => {
                     const installers = Array.isArray(order.installers) ? order.installers : [];
                     return installers.some((inst) => {
                         const id = typeof inst === 'string' ? inst : inst?._id;
                         return String(id) === String(user?._id);
                     });
+                });
+
+                relevantRepairs = repairsRes.data.filter((r) => {
+                    const installers = Array.isArray(r.installers) ? r.installers : [];
+                    return installers.some((inst) => String(inst) === String(user?._id));
                 });
             }
 
@@ -44,12 +54,24 @@ const CalendarView = () => {
                         title: `${order.clientName} (${displayOrderNumber})`,
                         start: new Date(order.installDateStart),
                         end: new Date(order.installDateEnd),
-                        resource: order,
+                        resource: { ...order, __type: 'order' },
                         allDay: true
                     };
                 });
 
-            setEvents(calendarEvents);
+            const repairEvents = relevantRepairs
+                .filter((r) => r.installDateStart && r.installDateEnd)
+                .map((r) => ({
+                    id: r._id,
+                    type: 'repair',
+                    title: `REPAIR: ${r.clientName} (${r.manualOrderNumber})`,
+                    start: new Date(r.installDateStart),
+                    end: new Date(r.installDateEnd),
+                    resource: { ...r, __type: 'repair' },
+                    allDay: true
+                }));
+
+            setEvents([...calendarEvents, ...repairEvents]);
         } catch (e) {
             console.error(e);
         }
@@ -98,8 +120,16 @@ const CalendarView = () => {
                         week: t('week'),
                         day: t('day')
                     }}
-                    // Click event opens the order
-                    onSelectEvent={(event) => window.location.href = `/orders/${event.id}`}
+                    eventPropGetter={(event) => {
+                        if (event.type === 'repair') {
+                            return { style: { backgroundColor: '#92400e', borderColor: '#92400e' } };
+                        }
+                        return {};
+                    }}
+                    onSelectEvent={(event) => {
+                        if (event.type === 'repair') window.location.href = `/repairs`;
+                        else window.location.href = `/orders/${event.id}`;
+                    }}
                 />
             </div>
         </div>

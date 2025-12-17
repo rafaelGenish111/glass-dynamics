@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Users, ShoppingCart, Factory, Shield, LogOut, Smartphone, Menu, X, Clock, Truck, Calendar as CalendarIcon, CheckCircle } from 'lucide-react';
+import { LayoutDashboard, Users, ShoppingCart, Factory, Shield, LogOut, Smartphone, Menu, X, Clock, Truck, Calendar as CalendarIcon, CheckCircle, Wrench } from 'lucide-react';
 
 const Layout = () => {
   const { t, i18n } = useTranslation();
@@ -28,6 +28,12 @@ const Layout = () => {
       label: t('active_orders'),
       path: '/',
       icon: <LayoutDashboard size={20} />,
+      roles: ['super_admin', 'admin', 'office']
+    },
+    {
+      label: 'Repairs',
+      path: '/repairs',
+      icon: <Wrench size={20} />,
       roles: ['super_admin', 'admin', 'office']
     },
     {

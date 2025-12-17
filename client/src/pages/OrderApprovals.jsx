@@ -101,7 +101,9 @@ const OrderApprovals = () => {
                       {fi.isIssued ? `Issued (${fi.invoiceNumber || '—'})` : 'Not issued'}
                     </td>
                     <td className="p-4">
-                      {fi.isPaid ? `Paid (${fi.amount ?? '—'})` : 'Not paid'}
+                      {fi.isPaid
+                        ? `Paid (${fi.amount ?? '—'})`
+                        : `Not paid${typeof fi.amount === 'number' ? ` (${fi.amount})` : ''}`}
                     </td>
                     <td className="p-4">
                       <div className="flex items-center gap-2">

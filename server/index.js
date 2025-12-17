@@ -8,6 +8,7 @@ const orderRoutes = require('./routes/orderRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const supplierRoutes = require('./routes/supplierRoutes');
 const productRoutes = require('./routes/productRoutes');
+const repairRoutes = require('./routes/repairRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -24,6 +25,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/suppliers', supplierRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/repairs', repairRoutes);
 // DB Connection
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('✅ MongoDB Connected'))

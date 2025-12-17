@@ -56,35 +56,58 @@ const InstallerApp = () => {
     const fetchJobs = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await axios.get(`${API_URL}/orders`, config);
-            const myJobs = res.data
+            const [ordersRes, repairsRes] = await Promise.all([
+                axios.get(`${API_URL}/orders`, config),
+                axios.get(`${API_URL}/repairs`, config)
+            ]);
+
+            const myOrderJobs = ordersRes.data
                 .filter((o) => ['scheduled', 'install'].includes(o.status)) // keep legacy
                 .filter(isAssignedToMe)
-                .filter((o) => inRange(o.installDateStart));
-            setJobs(myJobs);
+                .filter((o) => inRange(o.installDateStart))
+                .map((o) => ({ ...o, __type: 'order' }));
+
+            const myRepairJobs = repairsRes.data
+                .filter((r) => ['scheduled', 'in_progress'].includes(r.status))
+                .filter((r) => {
+                    const installers = Array.isArray(r.installers) ? r.installers : [];
+                    return installers.some((inst) => String(inst) === String(user?._id));
+                })
+                .filter((r) => inRange(r.installDateStart))
+                .map((r) => ({ ...r, __type: 'repair' }));
+
+            setJobs([...myOrderJobs, ...myRepairJobs]);
             setLoading(false);
         } catch (error) {
             console.error("Error fetching jobs:", error);
             setLoading(false);
         }
-    }, [config, inRange, isAssignedToMe]);
+    }, [config, inRange, isAssignedToMe, user?._id]);
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
     useEffect(() => { fetchJobs(); }, [fetchJobs]);
 
-    const handleFileUpload = async (e, orderId) => {
+    const handleFileUpload = async (e, job) => {
         const file = e.target.files[0];
         if (!file) return;
-        setUploadingId(orderId);
+        setUploadingId(job._id);
         const formData = new FormData();
         formData.append('image', file);
         try {
             const uploadRes = await axios.post(`${API_URL}/upload`, formData);
-            await axios.put(`${API_URL}/orders/${orderId}/files`, {
-                url: uploadRes.data.url,
-                type: 'site_photo',
-                name: 'Installation Proof'
-            }, config);
+            if (job.__type === 'repair') {
+                await axios.post(`${API_URL}/repairs/${job._id}/media`, {
+                    url: uploadRes.data.url,
+                    type: 'photo',
+                    name: file.name || 'Installation proof'
+                }, config);
+            } else {
+                await axios.put(`${API_URL}/orders/${job._id}/files`, {
+                    url: uploadRes.data.url,
+                    type: 'site_photo',
+                    name: 'Installation Proof'
+                }, config);
+            }
             alert(t('file_uploaded'));
             setUploadingId(null);
             fetchJobs();
@@ -95,10 +118,14 @@ const InstallerApp = () => {
         }
     };
 
-    const finishJob = async (orderId) => {
+    const finishJob = async (job) => {
         if (!window.confirm(t('finish_job') + '?')) return;
         try {
-            await axios.put(`${API_URL}/orders/${orderId}/status`, { status: 'pending_approval' }, config); // Move to pending approval
+            if (job.__type === 'repair') {
+                await axios.post(`${API_URL}/repairs/${job._id}/close`, {}, config);
+            } else {
+                await axios.put(`${API_URL}/orders/${job._id}/status`, { status: 'pending_approval' }, config); // Move to pending approval
+            }
             fetchJobs();
         } catch (e) {
             console.error(e);
@@ -178,6 +205,9 @@ const InstallerApp = () => {
                                 </div>
 
                                 <h3 className="text-xl font-bold text-white mb-1 pr-12">{job.clientName}</h3>
+                                {job.__type === 'repair' && (
+                                    <div className="text-xs font-bold text-amber-300 mb-2">REPAIR</div>
+                                )}
 
                                 <a
                                     href={`https://waze.com/ul?q=${job.clientAddress}`}
@@ -222,11 +252,11 @@ const InstallerApp = () => {
                                         ) : (
                                             <span className="flex items-center justify-center gap-2"><Camera /> {t('upload_proof')}</span>
                                         )}
-                                        <input type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => handleFileUpload(e, job._id)} />
+                                        <input type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => handleFileUpload(e, job)} />
                                     </label>
 
                                     <button
-                                        onClick={() => finishJob(job._id)}
+                                        onClick={() => finishJob(job)}
                                         className="w-full bg-emerald-600 active:bg-emerald-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg flex items-center justify-center gap-2 active:scale-95 transition"
                                     >
                                         <CheckCircle /> {t('finish_job')}
