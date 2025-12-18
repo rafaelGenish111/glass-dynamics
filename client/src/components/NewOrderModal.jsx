@@ -26,7 +26,7 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
 
     // Table 1: Client Products (No Location field)
     const [products, setProducts] = useState([]);
-    const [newProduct, setNewProduct] = useState({ type: '', description: '', dimensions: '', quantity: 1 });
+    const [newProduct, setNewProduct] = useState({ type: '', description: '', quantity: 1 });
 
     // Table 2: Materials (Only Glass, Paint, Other)
     const [materials, setMaterials] = useState([]);
@@ -92,7 +92,7 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
     const addProduct = () => {
         if (!newProduct.type) return;
         setProducts([...products, newProduct]);
-        setNewProduct({ type: '', description: '', dimensions: '', quantity: 1 });
+        setNewProduct({ type: '', description: '', quantity: 1 });
     };
 
     const addMaterial = () => {
@@ -322,9 +322,6 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
                             <input type="text" placeholder="Description" className="flex-[2] bg-slate-900 border border-slate-600 rounded p-2 text-sm text-white"
                                 value={newProduct.description} onChange={e => setNewProduct({ ...newProduct, description: e.target.value })} />
 
-                            <input type="text" placeholder="Dims" className="w-24 bg-slate-900 border border-slate-600 rounded p-2 text-sm text-white"
-                                value={newProduct.dimensions} onChange={e => setNewProduct({ ...newProduct, dimensions: e.target.value })} />
-
                             <input type="number" placeholder="Qty" className="w-20 bg-slate-900 border border-slate-600 rounded p-2 text-sm text-white"
                                 value={newProduct.quantity} onChange={e => setNewProduct({ ...newProduct, quantity: e.target.value })} />
 
@@ -336,7 +333,7 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
                             <div className="bg-slate-900 rounded border border-slate-800">
                                 {products.map((p, i) => (
                                     <div key={i} className="flex justify-between items-center p-2 border-b border-slate-800 text-sm text-slate-300 last:border-0">
-                                        <span>{p.quantity}x <b>{p.type}</b> - {p.description} <span className="text-xs text-slate-500 ml-2">[{p.dimensions}]</span></span>
+                                        <span>{p.quantity}x <b>{p.type}</b> - {p.description}</span>
                                         <button onClick={() => removeProduct(i)} className="text-slate-500 hover:text-red-400"><Trash2 size={16} /></button>
                                     </div>
                                 ))}
