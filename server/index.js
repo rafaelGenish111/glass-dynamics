@@ -1,43 +1,27 @@
+// index.js
 require('dotenv').config();
-const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
-const helmet = require('helmet');
-const authRoutes = require('./routes/authRoutes');
-const orderRoutes = require('./routes/orderRoutes');
-const uploadRoutes = require('./routes/uploadRoutes');
-const supplierRoutes = require('./routes/supplierRoutes');
-const productRoutes = require('./routes/productRoutes');
-const repairRoutes = require('./routes/repairRoutes');
+const app = require('./app'); // ייבוא הלוגיקה
 
-const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(express.json()); // Parsing JSON
-// CORS – in staging allow all origins. In production, prefer setting a specific origin via env.
-app.use(cors({ origin: '*' }));
-app.use(helmet()); // Security Headers
+// פונקציה להרצת השרת
+const startServer = async () => {
+    try {
+        // חיבור ל-DB
+        await mongoose.connect(process.env.MONGO_URI);
+        console.log('✅ MongoDB Connected');
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/upload', uploadRoutes);
-app.use('/api/suppliers', supplierRoutes);
-app.use('/api/products', productRoutes);
-app.use('/api/repairs', repairRoutes);
-// DB Connection
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('✅ MongoDB Connected'))
-    .catch(err => console.error('❌ DB Connection Error:', err));
+        // הרמת השרת
+        app.listen(PORT, '0.0.0.0', () => {
+            console.log(`🚀 Server running on port ${PORT}`);
+            console.log(`🌐 Access from network: http://localhost:${PORT}`);
+        });
 
-// Basic Route
-app.get('/', (req, res) => {
-    res.send('Glass Dynamic API is Running...');
-});
+    } catch (err) {
+        console.error('❌ Server Connection Error:', err);
+        process.exit(1);
+    }
+};
 
-// Start Server
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`🌐 Access from network: http://YOUR_IP:${PORT}`);
-});
+startServer();

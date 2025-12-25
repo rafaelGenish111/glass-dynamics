@@ -32,3 +32,4 @@ router.post('/:id/close', protect, authorize('super_admin', 'admin', 'office'), 
 router.put('/:id/issue', protect, authorize('super_admin', 'admin', 'office'), updateRepairIssue);
 
 module.exports = router;
+

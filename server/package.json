@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --detectOpenHandles --forceExit",
+    "prepare": "cd .. && husky install .husky"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +25,10 @@
     "multer-storage-cloudinary": "^4.0.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11"
+    "husky": "^8.0.3",
+    "jest": "^30.2.0",
+    "mongodb-memory-server": "^10.4.3",
+    "nodemon": "^3.1.11",
+    "supertest": "^7.1.4"
   }
 }
