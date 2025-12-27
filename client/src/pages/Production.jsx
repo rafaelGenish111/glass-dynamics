@@ -38,13 +38,13 @@ const Production = () => {
     }, [fetchProductionOrders]);
 
     const finishProduction = async (orderId) => {
-        if (!window.confirm('Finish production and send to scheduling?')) return;
+        if (!window.confirm(t('finish_production_confirm'))) return;
         try {
             await axios.put(`${API_URL}/orders/${orderId}/status`, { status: 'ready_for_install' }, config);
             fetchProductionOrders();
         } catch (e) {
             console.error(e);
-            alert('Error updating status');
+            alert(t('error_updating_status'));
         }
     };
 
@@ -66,7 +66,7 @@ const Production = () => {
             fetchProductionOrders();
         } catch (e) {
             console.error(e);
-            alert('Error saving production status');
+            alert(t('error_saving_production'));
         }
     };
 
@@ -80,7 +80,7 @@ const Production = () => {
         } catch (e) {
             console.error(e);
             setSavingId(null);
-            alert('Error saving note');
+            alert(t('error_saving_note'));
         }
     };
 
@@ -95,12 +95,12 @@ const Production = () => {
                     onClick={fetchProductionOrders}
                     className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-xl text-sm font-bold border border-slate-700"
                 >
-                    Refresh
+                    {t('refresh')}
                 </button>
             </div>
 
             {loading ? (
-                <div className="text-white">Loading...</div>
+                <div className="text-white">{t('loading')}</div>
             ) : orders.length === 0 ? (
                 <div className="bg-slate-800 p-12 rounded-2xl text-center border border-slate-700 opacity-50">
                     <Hammer className="mx-auto text-slate-500 mb-4" size={64} />
@@ -111,13 +111,13 @@ const Production = () => {
                     <table className="w-full text-left text-sm text-slate-300">
                         <thead className="bg-slate-800/50 text-slate-400 uppercase text-xs">
                             <tr>
-                                <th className="p-4">Order #</th>
-                                <th className="p-4">Client</th>
-                                <th className="p-4">Glass</th>
-                                <th className="p-4">Paint</th>
-                                <th className="p-4">Materials</th>
-                                <th className="p-4">Production note</th>
-                                <th className="p-4">Actions</th>
+                                <th className="p-4">{t('order_col')}</th>
+                                <th className="p-4">{t('client')}</th>
+                                <th className="p-4">{t('glass')}</th>
+                                <th className="p-4">{t('paint')}</th>
+                                <th className="p-4">{t('materials')}</th>
+                                <th className="p-4">{t('production_note')}</th>
+                                <th className="p-4">{t('actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-800">
@@ -149,7 +149,7 @@ const Production = () => {
                                                     }`}
                                                 title={glassRelevant ? '' : 'Auto-done (not relevant)'}
                                             >
-                                                {glassDone ? 'Done' : 'Not done'}
+                                                {glassDone ? t('done') : t('not_done')}
                                             </button>
                                         </td>
                                         <td className="p-4">
@@ -162,7 +162,7 @@ const Production = () => {
                                                     }`}
                                                 title={paintRelevant ? '' : 'Auto-done (not relevant)'}
                                             >
-                                                {paintDone ? 'Done' : 'Not done'}
+                                                {paintDone ? t('done') : t('not_done')}
                                             </button>
                                         </td>
                                         <td className="p-4">
@@ -175,7 +175,7 @@ const Production = () => {
                                                     }`}
                                                 title={materialsRelevant ? '' : 'Auto-done (not relevant)'}
                                             >
-                                                {materialsDone ? 'Done' : 'Not done'}
+                                                {materialsDone ? t('done') : t('not_done')}
                                             </button>
                                         </td>
                                         <td className="p-4">
@@ -184,7 +184,7 @@ const Production = () => {
                                                     type="text"
                                                     value={currentNote}
                                                     onChange={(e) => setDraftNotes((prev) => ({ ...prev, [order._id]: e.target.value }))}
-                                                    placeholder="Production note..."
+                                                    placeholder={t('production_note') + '..."'}
                                                     className="w-full min-w-[220px] bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-slate-600"
                                                 />
                                                 <button
@@ -192,9 +192,9 @@ const Production = () => {
                                                     onClick={() => saveProductionNote(order)}
                                                     disabled={savingId === order._id}
                                                     className="bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white px-3 py-2 rounded-lg text-xs font-bold border border-slate-700 inline-flex items-center gap-1"
-                                                    title="Save note"
+                                                    title={t('save')}
                                                 >
-                                                    <Save size={14} /> Save
+                                                    <Save size={14} /> {t('save')}
                                                 </button>
                                             </div>
                                         </td>
@@ -204,7 +204,7 @@ const Production = () => {
                                                     type="button"
                                                     onClick={() => {
                                                         if (!canReady) {
-                                                            alert('Please mark Glass, Paint, and Materials as Done before sending to scheduling.');
+                                                            alert(t('please_mark_all_done'));
                                                             return;
                                                         }
                                                         finishProduction(order._id);
@@ -214,7 +214,7 @@ const Production = () => {
                                                         : 'bg-slate-700 cursor-not-allowed opacity-60'
                                                         }`}
                                                 >
-                                                    <CheckCircle size={14} /> Ready for scheduling
+                                                    <CheckCircle size={14} /> {t('prod_ready_schedule')}
                                                 </button>
                                             </div>
                                         </td>

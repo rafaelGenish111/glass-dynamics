@@ -4,114 +4,336 @@ import { initReactI18next } from 'react-i18next';
 const resources = {
   en: {
     translation: {
-      // --- General / Layout ---
-      "active_orders": "Active Orders",
-      "new_order": "+ New Order",
-      "create_order": "Create Order",
-      "cancel": "Cancel",
-      "save": "Save",
+      // --- Sidebar (Main Toolbar) ---
+      "sidebar_active_orders": "Active Orders",
+      "sidebar_pending_items": "Pending Items",
+      "sidebar_purchasing": "Purchasing",
+      "sidebar_production": "Production",
+      "sidebar_scheduling": "Scheduling",
+      "sidebar_calendar": "Calendar",
+      "sidebar_financial": "Financial Approval",
+      "sidebar_completed": "Completed Orders",
+      "sidebar_users": "User Management",
+      "sidebar_customers": "Customers",
+      "sidebar_suppliers": "Suppliers Management",
+      "sidebar_installer_app": "Installer App",
+      "sidebar_repair": "Repair",
+
+      // --- Active Orders Page ---
+      "active_add_new": "+ New Order",
+      "active_col_order": "Order",
+      "active_col_client": "Client Name",
+      "active_col_address": "Address",
+      "active_col_items": "Items",
+      "active_col_status": "Status",
+      // Statuses in Active Orders
+      "status_offer": "Offer",
+      "status_production": "Production",
+      "status_install": "Install",
+      "status_pending_approval": "Pending Approval",
+      "status_new": "New",
+      "status_materials_pending": "Materials Pending",
+      "status_production_pending": "Production Pending",
+      "status_in_production": "In Production",
+      "status_ready_for_install": "Ready for Install",
+      "status_scheduled": "Scheduled",
+      "status_installed": "Installed",
+      "status_completed": "Completed",
+      "status_cancelled": "Cancelled",
+
+      // --- New Order Modal ---
+      "new_manual_order_num": "Manual Order #",
+      "new_region": "Region",
+      "new_phone": "Phone",
+      "new_deposit_date": "Deposit Date",
+      "new_est_work_days": "Est. Work Days",
+      "new_master_plan": "Master Plan",
+      "new_upload_plan": "Upload Master Plan",
+      "new_no_plan": "No master plan uploaded",
+      "new_products_title": "Products for Client",
+      "new_col_type": "Type",
+      "new_col_desc": "Description",
+      "new_materials_title": "Materials to Order",
+      "new_mat_glass": "Glass",
+      "new_mat_paint": "Paint",
+      "new_mat_other": "Other",
+      "new_select_supplier": "Select Supplier",
+      "new_btn_create": "Create Order",
+
+      // --- Pending Items (Purchasing Request) ---
+      "pending_title": "Pending Item to Order",
+      "pending_col_date": "Order Date",
+      "pending_col_order": "Order",
+      "pending_col_type": "Type", // Material type
+      "pending_col_desc": "Description",
+      "pending_col_note": "Add Note",
+      "pending_col_qty": "Qty",
+      "pending_col_action": "Action",
+      // Actions/Details
+      "pending_mark_ordered": "Mark as Ordered",
+      "pending_ordered_by": "Ordered By",
+      "pending_ordered_date": "Ordered Date",
+      "pending_confirm": "Confirm",
+
+      // --- Purchasing (Receiving) ---
+      "purchasing_receiving_title": "Purchasing & Receiving",
+      "purchasing_items_transit": "Items in Transit",
+
+      // --- Production ---
+      "prod_glass_step": "Glass",
+      "prod_paint_step": "Paint",
+      "prod_material_step": "Material",
+      "prod_note": "Production Note",
+      "prod_actions": "Actions",
+      "prod_btn_save": "Save",
+      "prod_status_done": "Done",
+      "prod_status_not_done": "Not Done",
+      "prod_ready_schedule": "Ready for Scheduling",
+
+      // --- Scheduling ---
+      "sched_search_placeholder": "Search...",
+      "sched_col_ready": "Ready to Schedule",
+      "sched_col_in_progress": "Scheduled / In Progress",
+      "sched_col_completed": "Completed",
+      "sched_date": "Scheduled Date",
+      "sched_action": "Action",
+      "sched_review": "Review in Approval",
+      "sched_resolve_issue": "Resolve Issue",
+      "sched_mark_issue": "Mark Issue",
+      "sched_issue_reason": "Issue Reason",
+
+      // --- Financial Approval ---
+      "fin_invoice": "Invoice",
+      "fin_status_not_issued": "Not Issued",
+      "fin_status_issued": "Issued",
+      "fin_payment": "Payment",
+      "fin_status_not_paid": "Not Paid",
+      "fin_approval_header": "Approval Order",
+      "fin_invoice_issued": "Invoice Issued",
+      "fin_invoice_num": "Invoice Number",
+      "fin_customer_paid": "Customer Paid",
+      "fin_complete_msg": "When invoice is issued and payment is marked as paid (with amount), the order will move to Completed Orders.",
+
+      // --- Completed Orders ---
+      "completed_closed": "Closed",
+
+      // --- User Management ---
+      "user_create_new": "Create New",
+      "user_password": "Password",
+      "user_role": "Role",
+      "user_lang": "Language",
+      "user_team": "Team Member",
+      "role_super_admin": "Super Admin",
+      "role_office": "Office",
+      "role_production": "Production",
+      "role_installer": "Installer",
+
+      // --- Customers ---
+      "cust_total_orders": "Total Orders",
+      "cust_last_activity": "Last Activity",
+
+      // --- Suppliers ---
+      "supp_add": "Add Supplier",
+      "supp_contact": "Contact Person",
+
+      // --- General / Legacy ---
       "search": "Search",
-      "dashboard": "Dashboard",
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
       "login": "Login",
       "logout": "Logout",
       "welcome": "Welcome",
-      "back_to_list": "Back to List",
-      "delete": "Delete",
-      
-      // --- Order Details ---
-      "order_number": "Order No.",
-      "manual_order_number": "Manual Order #",
+      "dashboard": "Dashboard",
+      "upload_doc": "Upload Document",
+      "files_media": "Files and Media",
+      "loading": "Loading...",
+      "hello": "Hello,",
+      "change_language": "Change language",
+      "español": "Español",
+      "english": "English",
+      "active_orders": "Active Orders",
+      "new_order": "New Order",
       "client_name": "Client Name",
       "address": "Address",
-      "region": "Region",
-      "phone": "Phone",
-      "email": "Email",
-      "items_count": "Items",
+      "items": "Items",
       "status": "Status",
-      "deposit_amount": "Deposit",
-      "deposit_date": "Deposit Date",
-      "est_work_days": "Est. Work Days",
-      "order_date": "Order Date",
-      "workflow": "Workflow",
-      
-      // --- Statuses ---
-      "status_scheduled": "Scheduled",
-      "status_pending_approval": "Pending Approval",
-      "status_material_pending": "Material Pending",
-      "status_production": "Production",
-      "status_in_production": "In Production",
-      "ready_for_install": "Ready for Installation",
-      
-      // --- Master Plan ---
-      "master_plan": "Master Plan",
-      "upload_master_plan": "Upload Master Plan",
-      "no_master_plan": "No master plan uploaded",
-      "view_master_plan": "View Master Plan",
-      
-      // --- Files & Media ---
-      "files_media": "Files and Media",
-      "upload_doc": "Upload Document / Photo",
-      
-      // --- Products Table (Client) ---
-      "products_for_client": "Products for Client",
-      "type": "Type",
-      "description": "Description",
-      "dimensions": "Dimensions",
-      "quantity": "Qty",
-      
-      // --- Materials Table (Factory) ---
-      "materials_to_order": "Materials to Order",
+      "phone": "Phone",
+      "no_open_orders": "No open orders. All done! 🎉",
+      "search_by_name": "Search by name...",
+      "area": "Area",
+      "deposit_paid": "Deposit paid",
+      "paid": "Paid",
+      "optional": "Optional",
+      "file_formats": "PNG/JPG/WebP/PDF",
+      "remove": "Remove",
+      "type_window_door": "Type (Window/Door)",
+      "qty": "Qty",
+      "material_description": "Material Description",
+      "no_pending_items": "No pending purchasing items.",
+      "order_date": "Order date",
+      "order_number": "Order #",
+      "client": "Client",
+      "pending_items_to_order": "Pending items to order",
+      "mark_ordered": "Mark ordered",
+      "ordered_by": "Ordered by",
+      "ordered_date": "Ordered date",
+      "production_floor": "Production Floor",
+      "no_production": "No production orders",
+      "refresh": "Refresh",
+      "order_col": "Order #",
       "glass": "Glass",
       "paint": "Paint",
-      "other": "Other",
-      "select_supplier": "Select Supplier",
-      "supplier": "Supplier",
-      
-      // --- Purchasing & Procurement ---
-      "purchasing_center": "Purchasing Center",
-      "pending_items_page": "Pending Items", 
-      "pending_item_to_order": "Pending Item to Order",
-      "material_type": "Type",
-      "ordered": "Ordered",
-      "purchasing_tracking": "Purchasing & Receiving",
-      "view_suppliers": "View Suppliers",
-      "supplier_management": "Supplier Management",
-      "add_supplier": "Add Supplier",
-      "contact_person": "Contact Person",
-
-      // --- Production ---
-      "view_production": "View Production",
-      "production_floor": "Production Floor",
-      "mark_ready": "Mark as Ready",
-      
-      // --- Installation / Calendar ---
-      "calendar": "Calendar",
+      "materials": "Materials",
+      "production_note": "Production note",
+      "actions": "Actions",
+      "done": "Done",
+      "not_done": "Not done",
+      "ready_for_scheduling": "Ready for scheduling",
+      "please_mark_all_done": "Please mark Glass, Paint, and Materials as Done before sending to scheduling.",
       "installations_center": "Installations Center",
-      "view_installations": "View Installations",
+      "col_ready": "Ready to Schedule",
+      "col_scheduled": "Scheduled / In Progress",
+      "col_pending_approval": "Pending Approval",
+      "order_col_header": "Order #",
+      "work_days": "Work days",
+      "scheduled_date": "Scheduled date",
       "schedule_job": "Schedule Job",
       "start_date": "Start Date",
       "end_date": "End Date",
       "assign_team": "Assign Team",
       "install_notes": "Installation Notes",
       "save_schedule": "Save Schedule",
-      "installer_app": "Installer App",
-      "my_tasks": "My Tasks Today",
-      "finish_job": "Finish Job",
-      "upload_proof": "Photo Proof",
-      
-      // --- Admin ---
-      "admin_panel": "User Management",
-      "create_user": "Create New User",
-      "role": "Role",
+      "schedule_repair": "Schedule repair",
+      "add_note": "Add note",
+      "review_in_approvals": "Review in approvals",
+      "resolve_issue": "Resolve issue",
+      "mark_issue": "Mark issue",
+      "scheduled": "Scheduled",
+      "no_orders_in_stage": "No orders in this stage.",
+      "master_plan": "Master plan",
+      "plan": "Plan",
+      "financial_approvals": "Financial approvals",
+      "region": "Region",
+      "invoice": "Invoice",
+      "payment": "Payment",
+      "review": "Review",
+      "approve_order": "Approve order",
+      "invoice_issued": "Invoice issued",
+      "invoice_number": "Invoice number",
+      "customer_paid": "Customer paid",
+      "amount_paid": "Amount paid",
+      "completed_orders": "Completed Orders",
+      "closed": "Closed",
+      "no_completed_orders": "No completed orders.",
+      "purchasing_receiving": "Purchasing & receiving",
+      "items_in_transit": "items in transit",
+      "confirm_received": "Confirm this item was received?",
+      "mark_not_received": "Mark this item as NOT received?",
+      "received": "Received:",
+      "no_open_purchasing_orders": "No open purchasing orders",
+      "admin_panel": "Admin Panel",
+      "create_user": "Create User",
       "name": "Name",
+      "email": "Email",
       "password": "Password",
-      
-      // --- Messages ---
-      "success": "Action Successful",
-      "error": "Error occurred",
+      "role": "Role",
+      "language": "Language",
+      "team_members": "Team members",
+      "edit": "Edit",
+      "edit_user": "Edit User:",
+      "reset_password": "Reset Password (Optional)",
+      "leave_empty_password": "Leave empty to keep current password",
+      "save_changes": "Save Changes",
+      "user_created_success": "User created successfully",
+      "user_updated_success": "User updated successfully!",
+      "error": "Error",
+      "repairs": "Repairs",
+      "new_repair_ticket": "New repair ticket",
+      "create_repair_ticket": "Create a repair ticket by order number.",
+      "contacted_date": "Contacted date",
+      "work_days_label": "Work days",
+      "warranty": "Warranty",
+      "in_warranty": "In warranty",
+      "out_of_warranty": "Out of warranty",
+      "payment_note": "Payment note",
+      "attachments": "Attachments",
+      "add_image_document": "Add image / document",
+      "files_will_upload": "Files will be uploaded after creating the ticket.",
+      "problem": "Problem",
+      "describe_issue": "Describe the issue...",
+      "creating": "Creating...",
+      "create": "Create",
+      "repair_ticket": "Repair ticket",
+      "no_media_yet": "No media yet.",
+      "media": "Media",
       "uploading": "Uploading...",
+      "upload": "Upload",
+      "notes": "Notes",
+      "no_notes": "No notes.",
+      "add_note_placeholder": "Add note...",
+      "add": "Add",
+      "search_by_order_client": "Search by order #, client, or problem",
+      "contacted": "Contacted",
+      "approve_to_scheduling": "Approve to scheduling",
+      "close": "Close",
+      "close_repair_ticket": "Close this repair ticket?",
+      "issue_reason_prompt": "Issue reason (will be visible in scheduling):",
+      "resolve_this_issue": "Resolve this issue?",
+      "no_repair_tickets": "No repair tickets.",
+      "no_orders_waiting_approval": "No orders waiting for approval.",
+      "customers": "Customers",
+      "search_client_placeholder": "Search by name, phone or address",
+      "total_orders": "Total Orders",
+      "last_activity": "Last Activity",
+      "loading_customers": "Loading customers...",
+      "no_customers_found": "No customers found.",
+      "showing_results": "Showing",
+      "results": "results",
+      "crm": "CRM",
+      "workflow": "Workflow",
+      "no_orders_found": "No orders found. Create one!",
+      "move_to_prod": "Move to Prod",
+      "supplier_management": "Suppliers Management",
+      "add_supplier": "Add Supplier",
+      "contact_person": "Contact Person",
+      "lead_time": "Lead Time",
+      "days": "days",
+      "supplier_added": "Supplier added!",
+      "delete_supplier": "Delete this supplier?",
+      "access_denied": "Access denied.",
+      "order_number_name_required": "Order Number & Name are required",
+      "no_materials_warning": "No materials added for ordering. Continue?",
+      "order_created_plan_failed": "Order created, but master plan upload failed",
+      "error_creating_order": "Error creating order",
+      "preview": "Preview",
+      "upload_master_plan_image": "Upload master plan image",
+      "no_master_plan_uploaded": "No master plan uploaded yet.",
+      "order_number_label": "Order Number",
+      "error_updating_status": "Error updating status",
+      "error_saving_production": "Error saving production status",
+      "error_saving_note": "Error saving note",
+      "finish_production_confirm": "Finish production and send to scheduling?",
+      "error_saving_approval": "Error saving approval",
+      "not_issued": "Not issued",
+      "issued": "Issued",
+      "not_paid": "Not paid",
+      "error_scheduling_job": "Error scheduling job",
+      "please_select_dates_installer": "Please select dates and at least one installer",
+      "error_updating_issue": "Error updating issue",
+      "error_scheduling_repair": "Error scheduling repair",
+      "error_approving_repair": "Error approving repair",
+      "error_closing_repair": "Error closing repair",
+      "error_adding_note": "Error adding note",
+      "upload_failed": "Upload failed",
+      "error_creating_repair": "Error creating repair",
+      "error_adding_supplier": "Error adding supplier",
+      "error_deleting": "Error deleting",
+      "error_updating_user": "Error updating user",
 
-      // --- Calendar Days & Months ---
+      // --- Calendar ---
+      "month": "Month",
+      "week": "Week",
       "monday": "Monday",
       "tuesday": "Tuesday",
       "wednesday": "Wednesday",
@@ -119,7 +341,6 @@ const resources = {
       "friday": "Friday",
       "saturday": "Saturday",
       "sunday": "Sunday",
-      
       "january": "January",
       "february": "February",
       "march": "March",
@@ -136,134 +357,355 @@ const resources = {
   },
   es: {
     translation: {
-      // --- General / Layout ---
-      "active_orders": "Trabajos en curso", //
-      "new_order": "+ Añadir nuevo",
-      "create_order": "Crear",
-      "cancel": "Cancelar",
-      "save": "Guardar",
+      // --- Sidebar (Main Toolbar) ---
+      "sidebar_active_orders": "Trabajos en curso",
+      "sidebar_pending_items": "Compras", //
+      "sidebar_purchasing": "Compras pendientes de recibir", //
+      "sidebar_production": "Fabricación", //
+      "sidebar_scheduling": "Instalaciones", //
+      "sidebar_calendar": "Calendario de instalaciones", //
+      "sidebar_financial": "Contabilidad", //
+      "sidebar_completed": "Trabajos terminados", //
+      "sidebar_users": "Gestión de usuarios", //
+      "sidebar_customers": "Clientes", //
+      "sidebar_suppliers": "Proveedores", //
+      "sidebar_installer_app": "App instalador", //
+      "sidebar_repair": "Arreglos", //
+
+      // --- Active Orders Page ---
+      "active_add_new": "+ añadir nuevo",
+      "active_col_order": "no. presupuesto", // Context: Active Order
+      "active_col_client": "cliente",
+      "active_col_address": "dirección",
+      "active_col_items": "Nº artículos",
+      "active_col_status": "estado",
+      // Statuses
+      "status_offer": "Presupuesto",
+      "status_production": "Pendiente fabricación",
+      "status_install": "Pendiente instalación",
+      "status_pending_approval": "Pendiente contabilizar",
+      "status_new": "Nuevo",
+      "status_materials_pending": "Pendiente compra",
+      "status_production_pending": "Pendiente producción",
+      "status_in_production": "En fabricación",
+      "status_ready_for_install": "Preparado para instalar",
+      "status_scheduled": "Programado",
+      "status_installed": "Instalado",
+      "status_completed": "Terminado",
+      "status_cancelled": "Cancelado",
+
+      // --- New Order Modal ---
+      "new_manual_order_num": "Nº de presupuesto", // Context: New Order
+      "new_region": "localidad",
+      "new_phone": "Nº de Teléfono",
+      "new_deposit_date": "fecha pago deposito",
+      "new_est_work_days": "días instalación",
+      "new_master_plan": "parte trabajo",
+      "new_upload_plan": "Descargar parte de trabajo", // Specific request
+      "new_no_plan": "Parte de trabajo pendiente de subir",
+      "new_products_title": "productos a instalar",
+      "new_col_type": "tipo", // Context: New Order -> Products
+      "new_col_desc": "descripción",
+      "new_materials_title": "material a pedir",
+      "new_mat_glass": "cristales", // Context: New Order -> Material
+      "new_mat_paint": "lacado",
+      "new_mat_other": "otro",
+      "new_select_supplier": "proveedor",
+      "new_btn_create": "crear",
+
+      // --- Pending Items (Compras) ---
+      "pending_title": "Artículos pendientes de pedir",
+      "pending_col_date": "fecha presupuesto",
+      "pending_col_order": "Nº presupuesto", // Context: Pending Items (Different capitalization in doc)
+      "pending_col_type": "material", // Context: Pending Items -> Type becomes 'material'
+      "pending_col_desc": "Descripción",
+      "pending_col_note": "comentarios",
+      "pending_col_qty": "Total",
+      "pending_col_action": "estado",
+      // Actions
+      "pending_mark_ordered": "pedido realizado",
+      "pending_ordered_by": "gestionado por",
+      "pending_ordered_date": "fecha pedida",
+      "pending_confirm": "confirmado",
+
+      // --- Purchasing (Compras pendientes de recibir) ---
+      "purchasing_receiving_title": "gestión de pedidos proveedores",
+      "purchasing_items_transit": "Artículos pendientes",
+
+      // --- Production (Fabricación) ---
+      "prod_glass_step": "Cristales pegados", // Specific step in production
+      "prod_paint_step": "Listones cortados", // Specific step in production
+      "prod_material_step": "Aluminio",
+      "prod_note": "Comentarios",
+      "prod_actions": "Estado",
+      "prod_btn_save": "Guardar",
+      "prod_status_done": "Hecho",
+      "prod_status_not_done": "pendiente",
+      "prod_ready_schedule": "Preparado para instalar",
+
+      // --- Scheduling (Instalaciones) ---
+      "sched_search_placeholder": "Buscar por nombre o presupuesto",
+      "sched_col_ready": "Sin iniciar",
+      "sched_col_in_progress": "En curso",
+      "sched_col_completed": "Terminado pendiente contabilizar",
+      "sched_date": "Fecha de instalación",
+      "sched_action": "Estado",
+      "sched_review": "Pendiente contabilizar",
+      "sched_resolve_issue": "Parado, incidencia abierta",
+      "sched_mark_issue": "Estado",
+      "sched_issue_reason": "Descripción de la incidencia",
+
+      // --- Financial Approval (Contabilidad) ---
+      "fin_invoice": "Factura",
+      "fin_status_not_issued": "Pendiente facturar",
+      "fin_status_issued": "Factura Nº",
+      "fin_payment": "Pagos",
+      "fin_status_not_paid": "Pago pendiente",
+      "fin_approval_header": "Facturación",
+      "fin_invoice_issued": "Facturado",
+      "fin_invoice_num": "Nº Factura",
+      "fin_customer_paid": "Importe pendiente de pago",
+      "fin_complete_msg": "Cuando se emite la factura y el pago se marca como pagado, el trabajo pasará a Trabajos terminados.",
+
+      // --- Completed Orders ---
+      "completed_closed": "Finalizado",
+
+      // --- User Management ---
+      "user_create_new": "Crear usuario nuevo",
+      "user_password": "Contraseña",
+      "user_role": "Puesto",
+      "user_lang": "Idioma",
+      "user_team": "Equipo",
+      "role_super_admin": "Admin",
+      "role_office": "Oficina",
+      "role_production": "Taller",
+      "role_installer": "Técnico",
+
+      // --- Customers ---
+      "cust_total_orders": "Total Trabajos",
+      "cust_last_activity": "Último trabajo",
+
+      // --- Suppliers ---
+      "supp_add": "Añadir proveedor",
+      "supp_contact": "Nombre de contacto",
+
+      // --- General ---
       "search": "Buscar",
-      "dashboard": "Tablero",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "delete": "Eliminar",
       "login": "Iniciar sesión",
       "logout": "Cerrar sesión",
       "welcome": "Bienvenido",
-      "back_to_list": "Volver a la lista",
-      "delete": "Eliminar",
-      
-      // --- Order Details ---
-      "order_number": "No. presupuesto",
-      "manual_order_number": "Nº de presupuesto", //
+      "dashboard": "Tablero",
+      "upload_doc": "Subir documento / foto",
+      "files_media": "Archivos y medios",
+      "loading": "Cargando...",
+      "hello": "Hola,",
+      "change_language": "Cambiar idioma",
+      "español": "Español",
+      "english": "English",
+      "active_orders": "Trabajos en curso",
+      "new_order": "Nuevo trabajo",
       "client_name": "Cliente",
       "address": "Dirección",
-      "region": "Localidad", //
-      "phone": "Nº de Teléfono",
-      "email": "Email",
-      "items_count": "Nº artículos",
+      "items": "Nº artículos",
       "status": "Estado",
-      "deposit_amount": "Depósito",
-      "deposit_date": "Fecha pago deposito", //
-      "est_work_days": "Días instalación", //
-      "order_date": "Fecha presupuesto", //
-      "workflow": "Flujo de trabajo",
-      
-      // --- Statuses ---
-      "status_scheduled": "Pendiente instalación", //
-      "status_pending_approval": "Pendiente contabilizar", //
-      "status_material_pending": "Pendiente compra", //
-      "status_production": "Pendiente fabricación", //
-      "status_in_production": "En Producción",
-      "ready_for_install": "Listo para instalar",
-      
-      // --- Master Plan ---
-      "master_plan": "Parte trabajo", //
-      "upload_master_plan": "Descargar parte de trabajo", //
-      "no_master_plan": "Parte de trabajo pendiente de subir", //
-      "view_master_plan": "Ver parte de trabajo",
-      
-      // --- Files & Media ---
-      "files_media": "Archivos y medios",
-      "upload_doc": "Subir documento / foto",
-      
-      // --- Products Table (Client) ---
-      "products_for_client": "Productos a instalar", //
-      "type": "Tipo", //
-      "description": "Descripción",
-      "dimensions": "Dimensiones",
-      "quantity": "Cant.",
-      
-      // --- Materials Table (Factory) ---
-      "materials_to_order": "Material a pedir", //
-      "glass": "Cristales", //
-      "paint": "Lacado", //
-      "other": "Otro", //
-      "select_supplier": "Proveedor", //
-      "supplier": "Proveedor",
-      
-      // --- Purchasing & Procurement ---
-      "purchasing_center": "Centro de compras",
-      "pending_items_page": "Compras", //
-      "pending_item_to_order": "Artículos pendientes de pedir", //
-      "material_type": "Material", //
-      "ordered": "Pedido",
-      "purchasing_tracking": "Compras y Recepción",
-      "view_suppliers": "Ver Proveedores",
-      "supplier_management": "Gestión de proveedores",
-      "add_supplier": "Añadir proveedor",
-      "contact_person": "Persona de contacto",
-
-      // --- Production ---
-      "view_production": "Ver Producción",
-      "production_floor": "Piso de producción",
-      "mark_ready": "Marcar como listo",
-
-      // --- Installation / Calendar ---
-      "calendar": "Calendario",
+      "phone": "Nº de Teléfono",
+      "no_open_orders": "No hay trabajos abiertos. ¡Todo hecho! 🎉",
+      "search_by_name": "Buscar por nombre...",
+      "area": "Área",
+      "deposit_paid": "Depósito pagado",
+      "paid": "Pagado",
+      "optional": "Opcional",
+      "file_formats": "PNG/JPG/WebP/PDF",
+      "remove": "Eliminar",
+      "type_window_door": "Tipo (Ventana/Puerta)",
+      "qty": "Cantidad",
+      "material_description": "Descripción del material",
+      "no_pending_items": "No hay artículos pendientes de compra.",
+      "order_date": "Fecha presupuesto",
+      "order_number": "Nº presupuesto",
+      "client": "Cliente",
+      "pending_items_to_order": "Artículos pendientes de pedir",
+      "mark_ordered": "Marcar como pedido",
+      "ordered_by": "Pedido por",
+      "ordered_date": "Fecha pedida",
+      "production_floor": "Taller",
+      "no_production": "No hay trabajos en producción",
+      "refresh": "Actualizar",
+      "order_col": "Nº presupuesto",
+      "glass": "Cristales pegados",
+      "paint": "Listones cortados",
+      "materials": "Aluminio",
+      "production_note": "Comentarios",
+      "actions": "Estado",
+      "done": "Hecho",
+      "not_done": "pendiente",
+      "ready_for_scheduling": "Preparado para instalar",
+      "please_mark_all_done": "Por favor marca Cristales, Lacado y Materiales como Hecho antes de enviar a instalación.",
       "installations_center": "Centro de instalaciones",
-      "view_installations": "Ver Instalaciones",
-      "schedule_job": "Agendar trabajo",
-      "start_date": "Fecha de inicio",
-      "end_date": "Fecha de finalización",
+      "col_ready": "Sin iniciar",
+      "col_scheduled": "En curso",
+      "col_pending_approval": "Pendiente contabilizar",
+      "order_col_header": "Nº presupuesto",
+      "work_days": "Días trabajo",
+      "scheduled_date": "Fecha instalación",
+      "schedule_job": "Programar trabajo",
+      "start_date": "Fecha inicio",
+      "end_date": "Fecha fin",
       "assign_team": "Asignar equipo",
-      "install_notes": "Notas de instalación",
-      "save_schedule": "Guardar horario",
-      "installer_app": "App de instaladores",
-      "my_tasks": "Mis tareas de hoy",
-      "finish_job": "Finalizar trabajo",
-      "upload_proof": "Foto de prueba",
-      
-      // --- Admin ---
+      "install_notes": "Notas instalación",
+      "save_schedule": "Guardar programación",
+      "schedule_repair": "Programar arreglo",
+      "add_note": "Añadir nota",
+      "review_in_approvals": "Revisar en contabilidad",
+      "resolve_issue": "Resolver incidencia",
+      "mark_issue": "Marcar incidencia",
+      "scheduled": "Programado",
+      "no_orders_in_stage": "No hay trabajos en esta etapa.",
+      "master_plan": "Parte trabajo",
+      "plan": "Plan",
+      "financial_approvals": "Contabilidad",
+      "region": "Localidad",
+      "invoice": "Factura",
+      "payment": "Pagos",
+      "review": "Revisar",
+      "approve_order": "Facturación",
+      "invoice_issued": "Facturado",
+      "invoice_number": "Nº Factura",
+      "customer_paid": "Cliente pagado",
+      "amount_paid": "Importe pagado",
+      "completed_orders": "Trabajos terminados",
+      "closed": "Finalizado",
+      "no_completed_orders": "No hay trabajos terminados.",
+      "purchasing_receiving": "Gestión de pedidos proveedores",
+      "items_in_transit": "artículos pendientes",
+      "confirm_received": "¿Confirmar que este artículo fue recibido?",
+      "mark_not_received": "¿Marcar este artículo como NO recibido?",
+      "received": "Recibido:",
+      "no_open_purchasing_orders": "No hay pedidos abiertos",
       "admin_panel": "Gestión de usuarios",
-      "create_user": "Crear nuevo usuario",
-      "role": "Rol",
+      "create_user": "Crear usuario nuevo",
       "name": "Nombre",
+      "email": "Email",
       "password": "Contraseña",
-      
-      // --- Messages ---
-      "success": "Acción exitosa",
-      "error": "Ocurrió un error",
+      "role": "Puesto",
+      "language": "Idioma",
+      "team_members": "Equipo",
+      "edit": "Editar",
+      "edit_user": "Editar usuario:",
+      "reset_password": "Restablecer contraseña (Opcional)",
+      "leave_empty_password": "Dejar vacío para mantener la contraseña actual",
+      "save_changes": "Guardar cambios",
+      "user_created_success": "Usuario creado exitosamente",
+      "user_updated_success": "¡Usuario actualizado exitosamente!",
+      "error": "Error",
+      "repairs": "Arreglos",
+      "new_repair_ticket": "Nuevo ticket de arreglo",
+      "create_repair_ticket": "Crear un ticket de arreglo por número de presupuesto.",
+      "contacted_date": "Fecha contacto",
+      "work_days_label": "Días trabajo",
+      "warranty": "Garantía",
+      "in_warranty": "En garantía",
+      "out_of_warranty": "Fuera de garantía",
+      "payment_note": "Nota pago",
+      "attachments": "Adjuntos",
+      "add_image_document": "Añadir imagen / documento",
+      "files_will_upload": "Los archivos se subirán después de crear el ticket.",
+      "problem": "Problema",
+      "describe_issue": "Describe el problema...",
+      "creating": "Creando...",
+      "create": "Crear",
+      "repair_ticket": "Ticket de arreglo",
+      "no_media_yet": "No hay medios aún.",
+      "media": "Medios",
       "uploading": "Subiendo...",
+      "upload": "Subir",
+      "notes": "Notas",
+      "no_notes": "No hay notas.",
+      "add_note_placeholder": "Añadir nota...",
+      "add": "Añadir",
+      "search_by_order_client": "Buscar por presupuesto, cliente o problema",
+      "contacted": "Contactado",
+      "approve_to_scheduling": "Aprobar para programar",
+      "close": "Cerrar",
+      "close_repair_ticket": "¿Cerrar este ticket de arreglo?",
+      "issue_reason_prompt": "Razón de la incidencia (será visible en programación):",
+      "resolve_this_issue": "¿Resolver esta incidencia?",
+      "no_repair_tickets": "No hay tickets de arreglo.",
+      "no_orders_waiting_approval": "No hay trabajos esperando aprobación.",
+      "customers": "Clientes",
+      "search_client_placeholder": "Buscar por nombre, teléfono o dirección",
+      "total_orders": "Total Trabajos",
+      "last_activity": "Último trabajo",
+      "loading_customers": "Cargando clientes...",
+      "no_customers_found": "No se encontraron clientes.",
+      "showing_results": "Mostrando",
+      "results": "resultados",
+      "crm": "CRM",
+      "workflow": "Flujo",
+      "no_orders_found": "No se encontraron trabajos. ¡Crea uno!",
+      "move_to_prod": "Mover a Prod",
+      "supplier_management": "Proveedores",
+      "add_supplier": "Añadir proveedor",
+      "contact_person": "Nombre de contacto",
+      "lead_time": "Tiempo de entrega",
+      "days": "días",
+      "supplier_added": "¡Proveedor añadido!",
+      "delete_supplier": "¿Eliminar este proveedor?",
+      "access_denied": "Acceso denegado.",
+      "order_number_name_required": "Número de presupuesto y nombre son requeridos",
+      "no_materials_warning": "No se añadieron materiales para pedir. ¿Continuar?",
+      "order_created_plan_failed": "Trabajo creado, pero falló la subida del parte de trabajo",
+      "error_creating_order": "Error al crear trabajo",
+      "preview": "Vista previa",
+      "upload_master_plan_image": "Subir imagen parte trabajo",
+      "no_master_plan_uploaded": "Aún no se ha subido parte de trabajo.",
+      "order_number_label": "Número presupuesto",
+      "error_updating_status": "Error al actualizar estado",
+      "error_saving_production": "Error al guardar estado producción",
+      "error_saving_note": "Error al guardar nota",
+      "finish_production_confirm": "¿Terminar producción y enviar a programación?",
+      "error_saving_approval": "Error al guardar aprobación",
+      "not_issued": "No emitida",
+      "issued": "Emitida",
+      "not_paid": "No pagado",
+      "error_scheduling_job": "Error al programar trabajo",
+      "please_select_dates_installer": "Por favor selecciona fechas y al menos un instalador",
+      "error_updating_issue": "Error al actualizar incidencia",
+      "error_scheduling_repair": "Error al programar arreglo",
+      "error_approving_repair": "Error al aprobar arreglo",
+      "error_closing_repair": "Error al cerrar arreglo",
+      "error_adding_note": "Error al añadir nota",
+      "upload_failed": "Error al subir",
+      "error_creating_repair": "Error al crear arreglo",
+      "error_adding_supplier": "Error al añadir proveedor",
+      "error_deleting": "Error al eliminar",
+      "error_updating_user": "Error al actualizar usuario",
 
-      // --- Calendar Days & Months (Added from new image) ---
-      "monday": "Lunes", //
-      "tuesday": "Martes", //
-      "wednesday": "Miércoles", //
-      "thursday": "Jueves", //
-      "friday": "Viernes", //
-      "saturday": "Sábado", //
-      "sunday": "Domingo", //
-      
-      "january": "Enero", //
-      "february": "Febrero", //
-      "march": "Marzo", //
-      "april": "Abril", //
-      "may": "Mayo", //
-      "june": "Junio", //
-      "july": "Julio", //
-      "august": "Agosto", //
-      "september": "Septiembre", //
-      "october": "Octubre", //
-      "november": "Noviembre", //
-      "december": "Diciembre" //
+      // --- Calendar ---
+      "month": "Mes",
+      "week": "Semana",
+      "monday": "Lunes",
+      "tuesday": "Martes",
+      "wednesday": "Miércoles",
+      "thursday": "Jueves",
+      "friday": "Viernes",
+      "saturday": "Sábado",
+      "sunday": "Domingo",
+      "january": "Enero",
+      "february": "Febrero",
+      "march": "Marzo",
+      "april": "Abril",
+      "may": "Mayo",
+      "june": "Junio",
+      "july": "Julio",
+      "august": "Agosto",
+      "september": "Septiembre",
+      "october": "Octubre",
+      "november": "Noviembre",
+      "december": "Diciembre"
     }
   }
 };
@@ -272,7 +714,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: "es", 
+    lng: "es", // שפת ברירת מחדל כפי שביקשת בעבר
     fallbackLng: "en",
     interpolation: {
       escapeValue: false

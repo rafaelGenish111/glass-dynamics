@@ -1,10 +1,12 @@
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import { Truck, CheckSquare, ChevronDown, ChevronUp, User, Calendar, FileText } from 'lucide-react';
 import { API_URL } from '../config/api';
 import MasterPlanPreviewModal from '../components/MasterPlanPreviewModal';
 
 const PurchasingTracking = () => {
+    const { t } = useTranslation();
     const [suppliers, setSuppliers] = useState([]);
     const [expandedSupplier, setExpandedSupplier] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
@@ -52,14 +54,14 @@ const PurchasingTracking = () => {
         <div className="max-w-5xl mx-auto">
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-3xl font-bold text-white flex items-center gap-3">
-                    <Truck className="text-emerald-500" /> Purchasing & receiving
+                    <Truck className="text-emerald-500" /> {t('purchasing_receiving_title')}
                 </h2>
                 <button
                     type="button"
                     onClick={fetchData}
                     className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-xl text-sm font-bold border border-slate-700"
                 >
-                    Refresh
+                    {t('refresh')}
                 </button>
             </div>
 
@@ -78,7 +80,7 @@ const PurchasingTracking = () => {
                                 </div>
                                 <div>
                                     <h3 className="text-lg font-bold text-white">{group._id}</h3>
-                                    <p className="text-sm text-slate-400">{group.items.filter(i => !i.isArrived).length} items in transit</p>
+                                    <p className="text-sm text-slate-400">{group.items.filter(i => !i.isArrived).length} {t('purchasing_items_transit')}</p>
                                 </div>
                             </div>
                             {expandedSupplier === group._id ? <ChevronUp className="text-slate-500" /> : <ChevronDown className="text-slate-500" />}

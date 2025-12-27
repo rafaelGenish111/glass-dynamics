@@ -37,11 +37,15 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
     const [clientSuggestions, setClientSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
 
-    // Master plan upload (image)
+    // Master plan upload (image or PDF)
     const [masterPlanFile, setMasterPlanFile] = useState(null);
     const masterPlanPreviewUrl = useMemo(() => {
         if (!masterPlanFile) return '';
         return URL.createObjectURL(masterPlanFile);
+    }, [masterPlanFile]);
+    
+    const isPDF = useMemo(() => {
+        return masterPlanFile?.type === 'application/pdf';
     }, [masterPlanFile]);
 
     // --- LOAD DATA ---
@@ -108,9 +112,9 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
 
     // --- SUBMIT ---
     const handleSubmit = async () => {
-        if (!formData.manualOrderNumber || !formData.clientName) return alert('Order Number & Name are required');
+        if (!formData.manualOrderNumber || !formData.clientName) return alert(t('order_number_name_required'));
         // Validation: Ensure at least one material if needed, or just warn
-        if (materials.length === 0 && !window.confirm("No materials added for ordering. Continue?")) return;
+        if (materials.length === 0 && !window.confirm(t('no_materials_warning'))) return;
 
         try {
             const created = await axios.post(`${API_URL}/orders`, {
@@ -132,7 +136,7 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
                     }, config);
                 } catch (e) {
                     console.error(e);
-                    alert('Order created, but master plan upload failed');
+                    alert(t('order_created_plan_failed'));
                 }
             }
 
@@ -140,7 +144,7 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
             onClose();
         } catch (e) {
             console.error(e);
-            alert(e.response?.data?.message || 'Error creating order');
+            alert(e.response?.data?.message || t('error_creating_order'));
         }
     };
 
@@ -150,7 +154,7 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
 
                 {/* Header */}
                 <div className="p-5 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
-                    <h2 className="text-xl font-bold text-white">{t('new_order')}</h2>
+                    <h2 className="text-xl font-bold text-white">{t('active_add_new')}</h2>
                     <button onClick={onClose} className="text-slate-400 hover:text-white"><X /></button>
                 </div>
 
@@ -161,7 +165,7 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
 
                         {/* Manual Order # */}
                         <div className="md:col-span-1">
-                            <label className="text-xs text-blue-400 block mb-1 font-bold">Manual Order #</label>
+                            <label className="text-xs text-blue-400 block mb-1 font-bold">{t('new_manual_order_num')}</label>
                             <input type="text" className="w-full bg-slate-950 border border-blue-500/50 rounded-lg p-2 text-white font-mono"
                                 value={formData.manualOrderNumber} onChange={e => setFormData({ ...formData, manualOrderNumber: e.target.value })}
                                 placeholder="e.g. 2024-100" />
@@ -173,7 +177,7 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
                             <label className="text-xs text-slate-400 block mb-1">{t('client_name')}</label>
                             <div className="relative">
                                 <input type="text" className="w-full bg-slate-800 border border-slate-600 rounded-lg p-2 text-white pl-8"
-                                    value={formData.clientName} onChange={handleNameChange} placeholder="Search by name..." />
+                                    value={formData.clientName} onChange={handleNameChange} placeholder={t('search_by_name')} />
                                 <User className="absolute left-2 top-2.5 text-slate-500" size={14} />
                             </div>
 
@@ -200,9 +204,9 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
 
                         {/* Region */}
                         <div>
-                            <label className="text-xs text-slate-400 block mb-1">Region</label>
+                            <label className="text-xs text-slate-400 block mb-1">{t('new_region')}</label>
                             <input type="text" className="w-full bg-slate-800 border border-slate-600 rounded-lg p-2 text-white"
-                                value={formData.region} onChange={e => setFormData({ ...formData, region: e.target.value })} placeholder="Area" />
+                                value={formData.region} onChange={e => setFormData({ ...formData, region: e.target.value })} placeholder={t('area')} />
                         </div>
 
                         {/* Address */}
@@ -214,7 +218,7 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
 
                         {/* Deposit */}
                         <div>
-                            <label className="text-xs text-slate-400 block mb-1">Deposit paid</label>
+                            <label className="text-xs text-slate-400 block mb-1">{t('deposit_paid')}</label>
                             <label className="flex items-center gap-2 text-sm text-slate-200 bg-slate-800 border border-slate-600 rounded-lg p-2">
                                 <input
                                     type="checkbox"
@@ -229,13 +233,13 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
                                     }}
                                     className="accent-emerald-500"
                                 />
-                                <span>Paid</span>
+                                <span>{t('paid')}</span>
                             </label>
                         </div>
 
                         {/* Deposit Date */}
                         <div>
-                            <label className="text-xs text-slate-400 block mb-1">Deposit date</label>
+                            <label className="text-xs text-slate-400 block mb-1">{t('new_deposit_date')}</label>
                             <input
                                 type="date"
                                 className="w-full bg-slate-800 border border-slate-600 rounded-lg p-2 text-white disabled:opacity-50"
@@ -247,7 +251,7 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
 
                         {/* Est. Days */}
                         <div>
-                            <label className="text-xs text-slate-400 block mb-1">Est. Work Days</label>
+                            <label className="text-xs text-slate-400 block mb-1">{t('new_est_work_days')}</label>
                             <input type="number" className="w-full bg-slate-800 border border-slate-600 rounded-lg p-2 text-white"
                                 value={formData.estimatedInstallationDays} onChange={e => setFormData({ ...formData, estimatedInstallationDays: e.target.value })} />
                         </div>
@@ -258,7 +262,7 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
                         <div className="flex items-center justify-between gap-3">
                             <div className="flex items-center gap-2 text-white font-bold">
                                 <FileText size={18} />
-                                <span>Master plan</span>
+                                <span>{t('new_master_plan')}</span>
                             </div>
                             {masterPlanPreviewUrl ? (
                                 <a
@@ -267,20 +271,20 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
                                     rel="noreferrer"
                                     className="text-indigo-300 hover:text-indigo-200 text-sm inline-flex items-center gap-1"
                                 >
-                                    Preview <ExternalLink size={12} />
+                                    {t('preview')} <ExternalLink size={12} />
                                 </a>
                             ) : (
-                                <span className="text-xs text-slate-500">Optional</span>
+                                <span className="text-xs text-slate-500">{t('optional')}</span>
                             )}
                         </div>
 
                         <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                             <label className="block w-full bg-slate-800 border-2 border-dashed border-slate-600 hover:border-indigo-500 text-slate-300 py-3 rounded-xl text-center cursor-pointer transition">
-                                <span className="font-bold">Upload master plan image</span>
-                                <div className="text-xs text-slate-400 mt-1">PNG/JPG/WebP</div>
+                                <span className="font-bold">{t('new_upload_plan')}</span>
+                                <div className="text-xs text-slate-400 mt-1">{t('file_formats')}</div>
                                 <input
                                     type="file"
-                                    accept="image/*"
+                                    accept="image/*,application/pdf"
                                     className="hidden"
                                     onChange={(e) => setMasterPlanFile(e.target.files?.[0] || null)}
                                 />
@@ -288,7 +292,22 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
 
                             {masterPlanPreviewUrl ? (
                                 <div className="rounded-xl overflow-hidden border border-slate-700 bg-black/30">
-                                    <img src={masterPlanPreviewUrl} alt="Master plan preview" className="w-full h-48 object-contain bg-black" />
+                                    {isPDF ? (
+                                        <div className="w-full h-48 bg-black flex flex-col items-center justify-center">
+                                            <FileText className="text-indigo-400 mb-2" size={48} />
+                                            <span className="text-sm text-slate-300 mb-2">{masterPlanFile?.name}</span>
+                                            <a
+                                                href={masterPlanPreviewUrl}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="text-xs text-indigo-400 hover:text-indigo-300 inline-flex items-center gap-1"
+                                            >
+                                                {t('preview')} <ExternalLink size={12} />
+                                            </a>
+                                        </div>
+                                    ) : (
+                                        <img src={masterPlanPreviewUrl} alt="Master plan preview" className="w-full h-48 object-contain bg-black" />
+                                    )}
                                     <div className="p-2 text-xs text-slate-400 flex items-center justify-between">
                                         <span className="truncate">{masterPlanFile?.name}</span>
                                         <button
@@ -296,13 +315,13 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
                                             onClick={() => setMasterPlanFile(null)}
                                             className="text-slate-300 hover:text-white"
                                         >
-                                            Remove
+                                            {t('remove')}
                                         </button>
                                     </div>
                                 </div>
                             ) : (
                                 <div className="text-sm text-slate-500 border border-slate-800 rounded-xl p-4">
-                                    No master plan uploaded yet.
+                                    {t('new_no_plan')}
                                 </div>
                             )}
                         </div>
@@ -312,17 +331,17 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
 
                     {/* SECTION 2: Client Products */}
                     <div>
-                        <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2"><Package className="text-purple-400" /> Products for Client</h3>
+                        <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2"><Package className="text-purple-400" /> {t('new_products_title')}</h3>
 
                         {/* Input Row */}
                         <div className="flex flex-col md:flex-row gap-2 mb-3 bg-slate-800 p-3 rounded-xl border border-slate-700">
-                            <input type="text" placeholder="Type (Window/Door)" className="flex-1 bg-slate-900 border border-slate-600 rounded p-2 text-sm text-white"
+                            <input type="text" placeholder={t('type_window_door')} className="flex-1 bg-slate-900 border border-slate-600 rounded p-2 text-sm text-white"
                                 value={newProduct.type} onChange={e => setNewProduct({ ...newProduct, type: e.target.value })} />
 
-                            <input type="text" placeholder="Description" className="flex-[2] bg-slate-900 border border-slate-600 rounded p-2 text-sm text-white"
+                            <input type="text" placeholder={t('new_col_desc')} className="flex-[2] bg-slate-900 border border-slate-600 rounded p-2 text-sm text-white"
                                 value={newProduct.description} onChange={e => setNewProduct({ ...newProduct, description: e.target.value })} />
 
-                            <input type="number" placeholder="Qty" className="w-20 bg-slate-900 border border-slate-600 rounded p-2 text-sm text-white"
+                            <input type="number" placeholder={t('qty')} className="w-20 bg-slate-900 border border-slate-600 rounded p-2 text-sm text-white"
                                 value={newProduct.quantity} onChange={e => setNewProduct({ ...newProduct, quantity: e.target.value })} />
 
                             <button onClick={addProduct} className="bg-purple-600 hover:bg-purple-500 text-white p-2 rounded"><Plus /></button>
@@ -343,26 +362,26 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
 
                     {/* SECTION 3: Materials */}
                     <div>
-                        <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2"><Hammer className="text-orange-400" /> Materials to Order</h3>
+                        <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2"><Hammer className="text-orange-400" /> {t('new_materials_title')}</h3>
 
                         <div className="flex flex-col md:flex-row gap-2 mb-3 bg-slate-800 p-3 rounded-xl border border-slate-700">
                             <select className="bg-slate-900 border border-slate-600 rounded p-2 text-sm text-white"
                                 value={newMaterial.materialType} onChange={e => setNewMaterial({ ...newMaterial, materialType: e.target.value })}>
-                                <option value="Glass">Glass</option>
-                                <option value="Paint">Paint</option>
-                                <option value="Other">Other</option>
+                                <option value="Glass">{t('new_mat_glass')}</option>
+                                <option value="Paint">{t('new_mat_paint')}</option>
+                                <option value="Other">{t('new_mat_other')}</option>
                             </select>
 
-                            <input type="text" placeholder="Material Description" className="flex-[2] bg-slate-900 border border-slate-600 rounded p-2 text-sm text-white"
+                            <input type="text" placeholder={t('material_description')} className="flex-[2] bg-slate-900 border border-slate-600 rounded p-2 text-sm text-white"
                                 value={newMaterial.description} onChange={e => setNewMaterial({ ...newMaterial, description: e.target.value })} />
 
                             <select className="flex-1 bg-slate-900 border border-slate-600 rounded p-2 text-sm text-white"
                                 value={newMaterial.supplier} onChange={e => setNewMaterial({ ...newMaterial, supplier: e.target.value })}>
-                                <option value="">Select Supplier</option>
+                                <option value="">{t('new_select_supplier')}</option>
                                 {suppliersList.map(s => <option key={s._id} value={s.name}>{s.name}</option>)}
                             </select>
 
-                            <input type="number" placeholder="Qty" className="w-20 bg-slate-900 border border-slate-600 rounded p-2 text-sm text-white"
+                            <input type="number" placeholder={t('qty')} className="w-20 bg-slate-900 border border-slate-600 rounded p-2 text-sm text-white"
                                 value={newMaterial.quantity} onChange={e => setNewMaterial({ ...newMaterial, quantity: e.target.value })} />
 
                             <button onClick={addMaterial} className="bg-orange-600 hover:bg-orange-500 text-white p-2 rounded"><Plus /></button>
@@ -389,7 +408,7 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
                 <div className="p-5 border-t border-slate-800 flex justify-end gap-3 bg-slate-900 rounded-b-2xl">
                     <button onClick={onClose} className="px-6 py-2 text-slate-400 hover:text-white">{t('cancel')}</button>
                     <button onClick={handleSubmit} className="px-8 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold shadow-lg flex items-center gap-2">
-                        <Save size={18} /> Create Order
+                        <Save size={18} /> {t('new_btn_create')}
                     </button>
                 </div>
             </div>

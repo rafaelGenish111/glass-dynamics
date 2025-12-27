@@ -25,80 +25,80 @@ const Layout = () => {
 
   const menuItems = [
     {
-      label: t('active_orders'),
+      label: t('sidebar_active_orders'),
       path: '/',
       icon: <LayoutDashboard size={20} />,
       roles: ['super_admin', 'admin', 'office']
     },
     {
-      label: 'Repairs',
+      label: t('repairs'),
       path: '/repairs',
       icon: <Wrench size={20} />,
       roles: ['super_admin', 'admin', 'office']
     },
     {
-      label: "Pending Items",
+      label: t('sidebar_pending_items'),
       path: '/procurement/pending',
       icon: <Clock size={20} />,
       roles: ['super_admin', 'admin', 'office']
     },
     {
-      label: 'Purchasing',
+      label: t('sidebar_purchasing'),
       path: '/procurement/tracking',
       icon: <Truck size={20} />,
       roles: ['super_admin', 'admin', 'office', 'production']
     },
 
     {
-      label: t('production'),
+      label: t('sidebar_production'),
       path: '/production',
       icon: <Factory size={20} />,
       roles: ['super_admin', 'admin', 'production']
     },
     {
-      label: 'Scheduling',
+      label: t('sidebar_scheduling'),
       path: '/installations',
       icon: <CalendarIcon size={20} />,
       roles: ['super_admin', 'admin', 'office']
     },
     {
-      label: t('calendar'),
+      label: t('sidebar_calendar'),
       path: '/calendar',
       icon: <CalendarIcon size={20} />,
       roles: ['super_admin', 'admin', 'office', 'production', 'installer']
     },
     {
-      label: 'Financial approvals',
+      label: t('sidebar_financial'),
       path: '/approvals',
       icon: <CheckCircle size={20} />,
       roles: ['super_admin', 'admin', 'office']
     },
     {
-      label: 'Completed orders',
+      label: t('sidebar_completed'),
       path: '/completed',
       icon: <CheckCircle size={20} />,
       roles: ['super_admin', 'admin', 'office']
     },
     {
-      label: t('admin_panel'),
+      label: t('sidebar_users'),
       path: '/admin',
       icon: <Shield size={20} />,
       roles: ['super_admin', 'admin']
     },
     {
-      label: t('customers'),
+      label: t('sidebar_customers'),
       path: '/customers',
       icon: <Users size={20} />,
       roles: ['super_admin', 'admin', 'office']
     },
     {
-      label: t('supplier_management'),
+      label: t('sidebar_suppliers'),
       path: '/admin/suppliers',
       icon: <ShoppingCart size={20} />,
       roles: ['super_admin', 'admin']
     },
     {
-      label: t('installer_app'),
+      label: t('sidebar_installer_app'),
       path: '/installer',
       icon: <Smartphone size={20} />,
       roles: ['super_admin', 'admin', 'installer']
@@ -116,7 +116,7 @@ const Layout = () => {
             type="button"
             onClick={toggleLanguage}
             className="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-700"
-            title="Change language"
+            title={t('change_language')}
           >
             {currentLang === 'en' ? 'ES' : 'EN'}
           </button>
@@ -140,7 +140,7 @@ const Layout = () => {
         </div>
 
         <div className="p-6 md:hidden mt-16">
-          <p className="text-sm text-slate-400">Hello, {user?.name}</p>
+          <p className="text-sm text-slate-400">{t('hello')} {user?.name}</p>
         </div>
 
         <nav className="flex-1 px-4 space-y-2 overflow-y-auto">
@@ -171,7 +171,7 @@ const Layout = () => {
             onClick={toggleLanguage}
             className="mb-3 w-full bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-xl text-sm font-bold border border-slate-700"
           >
-            {currentLang === 'en' ? 'Español' : 'English'}
+            {currentLang === 'en' ? t('español') : t('english')}
           </button>
           <button onClick={handleLogout} className="flex items-center gap-2 text-red-400 hover:text-red-300 text-sm w-full">
             <LogOut size={16} /> {t('logout')}

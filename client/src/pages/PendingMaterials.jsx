@@ -1,11 +1,13 @@
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import { ShoppingCart, Check, ChevronDown, ChevronUp, X, FileText } from 'lucide-react';
 import { API_URL } from '../config/api';
 import NoteModal from '../components/NoteModal';
 import MasterPlanPreviewModal from '../components/MasterPlanPreviewModal';
 
 const PendingMaterials = () => {
+  const { t } = useTranslation();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedSupplier, setExpandedSupplier] = useState(null);
@@ -66,14 +68,14 @@ const PendingMaterials = () => {
       fetchItems(); // refresh
     } catch (e) {
       console.error(e);
-      alert('Error');
+      alert(t('error'));
     }
   };
 
   return (
     <div className="max-w-7xl mx-auto">
       <h2 className="text-3xl font-bold text-white mb-6 flex items-center gap-3">
-        <ShoppingCart className="text-orange-500" /> Pending items to order
+        <ShoppingCart className="text-orange-500" /> {t('pending_title')}
       </h2>
 
       <div className="space-y-4">
@@ -90,7 +92,7 @@ const PendingMaterials = () => {
                 </div>
                 <div className="text-left">
                   <h3 className="text-lg font-bold text-white">{supplierName}</h3>
-                  <p className="text-sm text-slate-400">{supplierItems.length} pending items</p>
+                  <p className="text-sm text-slate-400">{supplierItems.length} {t('pending_items_to_order')}</p>
                 </div>
               </div>
               {expandedSupplier === supplierName ? <ChevronUp className="text-slate-500" /> : <ChevronDown className="text-slate-500" />}
@@ -101,13 +103,13 @@ const PendingMaterials = () => {
                 <table className="w-full text-left text-sm text-slate-300">
                   <thead className="text-slate-400 uppercase text-xs">
                     <tr>
-                      <th className="py-2 pr-4">Order date</th>
-                      <th className="py-2 pr-4">Order #</th>
-                      <th className="py-2 pr-4">Client</th>
-                      <th className="py-2 pr-4">Type</th>
-                      <th className="py-2 pr-4">Description</th>
-                      <th className="py-2 pr-4">Qty</th>
-                      <th className="py-2 pr-0">Action</th>
+                      <th className="py-2 pr-4">{t('pending_col_date')}</th>
+                      <th className="py-2 pr-4">{t('pending_col_order')}</th>
+                      <th className="py-2 pr-4">{t('client')}</th>
+                      <th className="py-2 pr-4">{t('pending_col_type')}</th>
+                      <th className="py-2 pr-4">{t('pending_col_desc')}</th>
+                      <th className="py-2 pr-4">{t('pending_col_qty')}</th>
+                      <th className="py-2 pr-0">{t('pending_col_action')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800/70">
@@ -130,9 +132,9 @@ const PendingMaterials = () => {
                                 type="button"
                                 onClick={() => setPreviewUrl(item.masterPlanUrl)}
                                 className="bg-indigo-700 hover:bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold inline-flex items-center gap-1"
-                                title="View master plan"
+                                title={t('master_plan')}
                               >
-                                <FileText size={14} /> Plan
+                                <FileText size={14} /> {t('plan')}
                               </button>
                             )}
                             <button
@@ -140,14 +142,14 @@ const PendingMaterials = () => {
                               onClick={() => openOrderModal(item)}
                               className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold inline-flex items-center gap-1 transition shadow-lg"
                             >
-                              <Check size={14} /> Mark ordered
+                              <Check size={14} /> {t('pending_mark_ordered')}
                             </button>
                             <button
                               type="button"
                               onClick={() => setNoteOrderId(item.orderId)}
                               className="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-700"
                             >
-                              Add note
+                              {t('pending_col_note')}
                             </button>
                           </div>
                         </td>
@@ -162,7 +164,7 @@ const PendingMaterials = () => {
 
         {items.length === 0 && !loading && (
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-10 text-center text-slate-500">
-            No pending purchasing items.
+            {t('no_pending_items')}
           </div>
         )}
       </div>
@@ -172,7 +174,7 @@ const PendingMaterials = () => {
           <div className="bg-slate-900 w-full max-w-lg rounded-2xl border border-slate-700 shadow-2xl">
             <div className="p-5 border-b border-slate-800 flex justify-between items-center">
               <div>
-                <h3 className="text-lg font-bold text-white">Mark as ordered</h3>
+                <h3 className="text-lg font-bold text-white">{t('pending_mark_ordered')}</h3>
                 <p className="text-xs text-slate-400 mt-1">
                   #{selectedItem.orderNumber} · {selectedItem.clientName} · {selectedItem.description}
                 </p>
@@ -184,7 +186,7 @@ const PendingMaterials = () => {
 
             <div className="p-5 space-y-4">
               <div>
-                <label className="text-xs text-slate-400 block mb-1">Ordered by</label>
+                <label className="text-xs text-slate-400 block mb-1">{t('pending_ordered_by')}</label>
                 <input
                   type="text"
                   className="w-full bg-slate-800 border border-slate-600 rounded-lg p-2 text-white"
@@ -194,7 +196,7 @@ const PendingMaterials = () => {
               </div>
 
               <div>
-                <label className="text-xs text-slate-400 block mb-1">Ordered date</label>
+                <label className="text-xs text-slate-400 block mb-1">{t('pending_ordered_date')}</label>
                 <input
                   type="date"
                   className="w-full bg-slate-800 border border-slate-600 rounded-lg p-2 text-white"
@@ -206,14 +208,14 @@ const PendingMaterials = () => {
 
             <div className="p-5 border-t border-slate-800 flex justify-end gap-3">
               <button type="button" onClick={closeOrderModal} className="px-4 py-2 text-slate-400 hover:text-white">
-                Cancel
+                {t('cancel')}
               </button>
               <button
                 type="button"
                 onClick={submitOrder}
                 className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold inline-flex items-center gap-2"
               >
-                <Check size={18} /> Confirm
+                <Check size={18} /> {t('pending_confirm')}
               </button>
             </div>
           </div>
@@ -232,7 +234,7 @@ const PendingMaterials = () => {
       {previewUrl && (
         <MasterPlanPreviewModal
           url={previewUrl}
-          title="Master plan"
+          title={t('master_plan')}
           onClose={() => setPreviewUrl('')}
         />
       )}

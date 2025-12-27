@@ -1,11 +1,13 @@
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import { CheckCircle, X, Receipt, CreditCard, FileText } from 'lucide-react';
 import { API_URL } from '../config/api';
 import NoteModal from '../components/NoteModal';
 import MasterPlanPreviewModal from '../components/MasterPlanPreviewModal';
 
 const OrderApprovals = () => {
+  const { t } = useTranslation();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
@@ -67,26 +69,26 @@ const OrderApprovals = () => {
   return (
     <div className="max-w-6xl mx-auto">
       <h2 className="text-3xl font-bold text-white mb-6 flex items-center gap-3">
-        <CheckCircle className="text-emerald-500" /> Financial approvals
+        <CheckCircle className="text-emerald-500" /> {t('financial_approvals')}
       </h2>
 
       <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
         <table className="w-full text-left text-sm text-slate-300">
           <thead className="bg-slate-800/50 text-slate-400 uppercase text-xs">
             <tr>
-              <th className="p-4">Order #</th>
-              <th className="p-4">Client</th>
-              <th className="p-4">Region</th>
-              <th className="p-4">Invoice</th>
-              <th className="p-4">Payment</th>
-              <th className="p-4">Action</th>
+              <th className="p-4">{t('order_col')}</th>
+              <th className="p-4">{t('client')}</th>
+              <th className="p-4">{t('region')}</th>
+              <th className="p-4">{t('fin_invoice')}</th>
+              <th className="p-4">{t('fin_payment')}</th>
+              <th className="p-4">{t('sched_action')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800">
             {loading ? (
-              <tr><td colSpan="6" className="p-8 text-center text-slate-400">Loading...</td></tr>
+              <tr><td colSpan="6" className="p-8 text-center text-slate-400">{t('loading')}</td></tr>
             ) : orders.length === 0 ? (
-              <tr><td colSpan="6" className="p-8 text-center text-slate-500">No orders waiting for approval.</td></tr>
+              <tr><td colSpan="6" className="p-8 text-center text-slate-500">{t('no_orders_waiting_approval')}</td></tr>
             ) : (
               orders.map((o) => {
                 const displayOrderNumber = o.manualOrderNumber || o.orderNumber || o._id;
@@ -98,12 +100,12 @@ const OrderApprovals = () => {
                     <td className="p-4 font-semibold text-white">{o.clientName}</td>
                     <td className="p-4">{o.region || '—'}</td>
                     <td className="p-4">
-                      {fi.isIssued ? `Issued (${fi.invoiceNumber || '—'})` : 'Not issued'}
+                      {fi.isIssued ? `${t('fin_status_issued')} (${fi.invoiceNumber || '—'})` : t('fin_status_not_issued')}
                     </td>
                     <td className="p-4">
                       {fi.isPaid
-                        ? `Paid (${fi.amount ?? '—'})`
-                        : `Not paid${typeof fi.amount === 'number' ? ` (${fi.amount})` : ''}`}
+                        ? `${t('paid')} (${fi.amount ?? '—'})`
+                        : `${t('fin_status_not_paid')}${typeof fi.amount === 'number' ? ` (${fi.amount})` : ''}`}
                     </td>
                     <td className="p-4">
                       <div className="flex items-center gap-2">
@@ -113,7 +115,7 @@ const OrderApprovals = () => {
                             onClick={() => setPreviewUrl(masterPlan.url)}
                             className="bg-indigo-700 hover:bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold inline-flex items-center gap-1"
                           >
-                            <FileText size={14} /> Plan
+                            <FileText size={14} /> {t('plan')}
                           </button>
                         )}
                         <button
@@ -121,14 +123,14 @@ const OrderApprovals = () => {
                           onClick={() => openModal(o)}
                           className="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-700"
                         >
-                          Review
+                          {t('review')}
                         </button>
                         <button
                           type="button"
                           onClick={() => setNoteOrderId(o._id)}
                           className="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-700"
                         >
-                          Add note
+                          {t('pending_col_note')}
                         </button>
                       </div>
                     </td>
@@ -145,7 +147,7 @@ const OrderApprovals = () => {
           <div className="bg-slate-900 w-full max-w-lg rounded-2xl border border-slate-700 shadow-2xl">
             <div className="p-5 border-b border-slate-800 flex justify-between items-center">
               <div>
-                <h3 className="text-lg font-bold text-white">Approve order</h3>
+                <h3 className="text-lg font-bold text-white">{t('fin_approval_header')}</h3>
                 <p className="text-xs text-slate-400 mt-1">{selected.clientName}</p>
               </div>
               <button type="button" onClick={closeModal} className="text-slate-400 hover:text-white">
@@ -162,11 +164,11 @@ const OrderApprovals = () => {
                     onChange={(e) => setForm((p) => ({ ...p, isIssued: e.target.checked }))}
                     className="accent-emerald-500"
                   />
-                  <span className="inline-flex items-center gap-2"> Invoice issued</span>
+                  <span className="inline-flex items-center gap-2"> {t('fin_invoice_issued')}</span>
                 </label>
 
                 <div>
-                  <label className="text-xs text-slate-400 block mb-1">Invoice number</label>
+                  <label className="text-xs text-slate-400 block mb-1">{t('fin_invoice_num')}</label>
                   <input
                     type="text"
                     className="w-full bg-slate-800 border border-slate-600 rounded-lg p-2 text-white"
@@ -185,11 +187,11 @@ const OrderApprovals = () => {
                     onChange={(e) => setForm((p) => ({ ...p, isPaid: e.target.checked }))}
                     className="accent-emerald-500"
                   />
-                  <span className="inline-flex items-center gap-2">Customer paid</span>
+                  <span className="inline-flex items-center gap-2">{t('fin_customer_paid')}</span>
                 </label>
 
                 <div>
-                  <label className="text-xs text-slate-400 block mb-1">Amount paid</label>
+                  <label className="text-xs text-slate-400 block mb-1">{t('amount_paid')}</label>
                   <input
                     type="number"
                     className="w-full bg-slate-800 border border-slate-600 rounded-lg p-2 text-white"
@@ -201,20 +203,20 @@ const OrderApprovals = () => {
               </div>
 
               <p className="text-xs text-slate-500">
-                When invoice is issued and payment is marked as paid (with amount), the order will move to Completed Orders.
+                {t('fin_complete_msg')}
               </p>
             </div>
 
             <div className="p-5 border-t border-slate-800 flex justify-end gap-3">
               <button type="button" onClick={closeModal} className="px-4 py-2 text-slate-400 hover:text-white">
-                Cancel
+                {t('cancel')}
               </button>
               <button
                 type="button"
                 onClick={save}
                 className="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold"
               >
-                Save
+                {t('save')}
               </button>
             </div>
           </div>
@@ -233,7 +235,7 @@ const OrderApprovals = () => {
       {previewUrl && (
         <MasterPlanPreviewModal
           url={previewUrl}
-          title="Master plan"
+          title={t('master_plan')}
           onClose={() => setPreviewUrl('')}
         />
       )}
@@ -242,6 +244,7 @@ const OrderApprovals = () => {
 };
 
 export default OrderApprovals;
+
 
 
 

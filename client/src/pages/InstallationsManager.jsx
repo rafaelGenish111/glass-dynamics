@@ -90,7 +90,7 @@ const InstallationsManager = () => {
   }, []);
 
   const markIssue = async (order) => {
-    const reason = window.prompt('Issue reason (will be visible in scheduling):', order?.issue?.reason || '');
+    const reason = window.prompt(t('sched_issue_reason') + ':', order?.issue?.reason || '');
     if (reason === null) return;
     try {
       const url = order.__type === 'repair'
@@ -105,7 +105,7 @@ const InstallationsManager = () => {
   };
 
   const resolveIssue = async (order) => {
-    if (!window.confirm('Resolve this issue?')) return;
+    if (!window.confirm(t('resolve_this_issue'))) return;
     try {
       const url = order.__type === 'repair'
         ? `${API_URL}/repairs/${order._id}/issue`
@@ -140,7 +140,7 @@ const InstallationsManager = () => {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by client or order #"
+            placeholder={t('sched_search_placeholder')}
             className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-sm text-white placeholder:text-slate-500"
           />
         </div>
@@ -185,13 +185,13 @@ const InstallationsManager = () => {
         <table className="w-full text-left text-sm text-slate-300">
           <thead className="bg-slate-800/50 text-slate-400 uppercase text-xs">
             <tr>
-              <th className="p-4">Order #</th>
-              <th className="p-4">Client</th>
-              <th className="p-4">Work days</th>
-              <th className="p-4">Deposit date</th>
-              <th className="p-4">Scheduled date</th>
-              <th className="p-4">Region</th>
-              <th className="p-4">Action</th>
+              <th className="p-4">{t('order_col')}</th>
+              <th className="p-4">{t('client')}</th>
+              <th className="p-4">{t('work_days')}</th>
+              <th className="p-4">{t('new_deposit_date')}</th>
+              <th className="p-4">{t('sched_date')}</th>
+              <th className="p-4">{t('region')}</th>
+              <th className="p-4">{t('sched_action')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800">
@@ -231,7 +231,7 @@ const InstallationsManager = () => {
                         )}
                       </div>
                       {hasIssue && order.issue?.reason && (
-                        <div className="text-xs text-red-200/80 mt-1">Reason: {order.issue.reason}</div>
+                        <div className="text-xs text-red-200/80 mt-1">{t('sched_issue_reason')}: {order.issue.reason}</div>
                       )}
                     </td>
                     <td className="p-4 font-semibold text-white">{order.clientName}</td>
@@ -289,7 +289,7 @@ const InstallationsManager = () => {
                             onClick={() => navigate('/approvals')}
                             className="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-700"
                           >
-                            Review in approvals
+                            {t('sched_review')}
                           </button>
                         </div>
                       )}
@@ -311,7 +311,7 @@ const InstallationsManager = () => {
                               onClick={() => resolveIssue(order)}
                               className="bg-red-900/30 hover:bg-red-900/40 text-red-100 px-3 py-1.5 rounded-lg text-xs font-bold border border-red-900/40"
                             >
-                              Resolve issue
+                              {t('sched_resolve_issue')}
                             </button>
                           ) : (
                             <button
@@ -319,10 +319,10 @@ const InstallationsManager = () => {
                               onClick={() => markIssue(order)}
                               className="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-700"
                             >
-                              Mark issue
+                              {t('sched_mark_issue')}
                             </button>
                           )}
-                          <span className="text-slate-500 text-xs">Scheduled</span>
+                          <span className="text-slate-500 text-xs">{t('scheduled')}</span>
                         </div>
                       )}
                     </td>

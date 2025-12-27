@@ -9,6 +9,18 @@ import { Calendar as CalendarIcon } from 'lucide-react';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { API_URL } from '../config/api';
 
+// הגדרת תחילת השבוע ליום שני (1 = Monday) לפני יצירת ה-localizer
+moment.locale('en', {
+    week: {
+        dow: 1, // Monday is the first day of the week
+    }
+});
+moment.locale('es', {
+    week: {
+        dow: 1, // Monday is the first day of the week
+    }
+});
+
 // מגדירים את ה-Localizer מחוץ לקומפוננטה
 const localizer = momentLocalizer(moment);
 
@@ -33,9 +45,14 @@ const CalendarView = () => {
     const currentLang = (i18n.language || 'en').startsWith('es') ? 'es' : 'en';
 
     // עדכון שפת ה-Moment בכל פעם שהשפה משתנה
+    // הגדרת תחילת השבוע ליום שני (1 = Monday)
     useEffect(() => {
         console.log('Switching calendar language to:', currentLang);
-        moment.locale(currentLang);
+        moment.locale(currentLang, {
+            week: {
+                dow: 1, // Monday is the first day of the week
+            }
+        });
     }, [currentLang]);
 
     const isRestricted = ['installer', 'production'].includes(user?.role);

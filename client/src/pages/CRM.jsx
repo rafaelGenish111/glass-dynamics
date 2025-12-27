@@ -39,9 +39,23 @@ const CRM = () => {
       case 'offer': return 'bg-slate-700 text-slate-300';
       case 'production': return 'bg-amber-500/20 text-amber-400';
       case 'install': return 'bg-blue-500/20 text-blue-400';
+      case 'new': return 'bg-blue-500/20 text-blue-400';
+      case 'materials_pending': return 'bg-orange-500/20 text-orange-400';
+      case 'production_pending': return 'bg-yellow-500/20 text-yellow-400';
+      case 'in_production': return 'bg-amber-500/20 text-amber-400';
+      case 'ready_for_install': return 'bg-green-500/20 text-green-400';
+      case 'scheduled': return 'bg-blue-500/20 text-blue-400';
+      case 'installed': return 'bg-purple-500/20 text-purple-400';
+      case 'pending_approval': return 'bg-indigo-500/20 text-indigo-400';
       case 'completed': return 'bg-emerald-500/20 text-emerald-400';
+      case 'cancelled': return 'bg-red-500/20 text-red-400';
       default: return 'bg-slate-700 text-white';
     }
+  };
+
+  const getStatusTranslation = (status) => {
+    const statusKey = `status_${status}`;
+    return t(statusKey) || status.toUpperCase();
   };
 
   return (
@@ -88,13 +102,13 @@ const CRM = () => {
                 </td>
                 <td className="p-4">
                   <span className={`px-2 py-1 rounded text-xs font-bold border border-white/5 ${getStatusColor(order.status)}`}>
-                    {order.status.toUpperCase()}
+                    {getStatusTranslation(order.status)}
                   </span>
                 </td>
                 <td className="p-4 text-sm text-slate-500">Route {order.workflow}</td>
                 <td className="p-4">
                   <span className={`px-2 py-1 rounded text-xs font-bold border border-white/5 ${getStatusColor(order.status)}`}>
-                    {order.status.toUpperCase()}
+                    {getStatusTranslation(order.status)}
                   </span>
                   {/* Dev shortcut button – move offer directly to production */}
                   {order.status === 'offer' && (
