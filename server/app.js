@@ -12,12 +12,35 @@ const repairRoutes = require('./routes/repairRoutes');
 const app = express();
 
 // Middleware
-app.use(express.json()); 
+app.use(express.json());
+
+// CORS configuration - support multiple origins
+const allowedOrigins = [
+    'https://glass-dynamics.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:3000',
+    process.env.CORS_ORIGIN
+].filter(Boolean); // Remove undefined values
+
 app.use(cors({
-    origin: process.env.CORS_ORIGIN, // חייב להיות הכתובת המדויקת, בלי '*'
-    credentials: true // <-- זו השורה שחסרה לך בשביל Login
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            // If CORS_ORIGIN is set and matches, allow it
+            if (process.env.CORS_ORIGIN && origin === process.env.CORS_ORIGIN) {
+                callback(null, true);
+            } else {
+                callback(new Error('Not allowed by CORS'));
+            }
+        }
+    },
+    credentials: true
 }));
-app.use(helmet()); 
+app.use(helmet());
 
 // Routes
 app.use('/api/auth', authRoutes);
