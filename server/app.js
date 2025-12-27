@@ -1,4 +1,4 @@
-// app.js
+// server/app.js
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -11,36 +11,35 @@ const repairRoutes = require('./routes/repairRoutes');
 
 const app = express();
 
-// Middleware
-app.use(express.json());
+// 1. הגדרת משתנה המקור המורשה
+const allowedOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
+console.log(`🔒 CORS Configured for origin: ${allowedOrigin}`); // לוג לבדיקה
 
-// CORS configuration - support multiple origins
-const allowedOrigins = [
-    'https://glass-dynamics.vercel.app',
-    'http://localhost:5173',
-    'http://localhost:3000',
-    process.env.CORS_ORIGIN
-].filter(Boolean); // Remove undefined values
-
+// 2. הגדרת CORS מתקדמת
 app.use(cors({
-    origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests)
+    origin: (origin, callback) => {
+        // מאפשר בקשות ללא origin (כמו Postman או סקריפטים שרת-לשרת)
         if (!origin) return callback(null, true);
 
-        if (allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
+        // בדיקה האם המקור תואם להגדרות
+        if (origin === allowedOrigin || origin === 'http://localhost:5173') {
+            return callback(null, true);
         } else {
-            // If CORS_ORIGIN is set and matches, allow it
-            if (process.env.CORS_ORIGIN && origin === process.env.CORS_ORIGIN) {
-                callback(null, true);
-            } else {
-                callback(new Error('Not allowed by CORS'));
-            }
+            console.log(`🚫 Blocked CORS request from: ${origin}`); // לוג חסימה
+            return callback(new Error('Not allowed by CORS'));
         }
     },
-    credentials: true
+    credentials: true, // חובה בשביל Login (Cookies/Headers)
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.use(helmet());
+
+// 3. הגדרת Helmet (עם ביטול חסימת Cross-Origin)
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
+
+app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -55,5 +54,4 @@ app.get('/', (req, res) => {
     res.send('Glass Dynamic API is Running...');
 });
 
-// שינוי קריטי: אנחנו מייצאים את האפליקציה, לא מפעילים אותה!
 module.exports = app;
