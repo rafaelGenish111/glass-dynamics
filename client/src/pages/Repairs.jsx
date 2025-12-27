@@ -14,6 +14,9 @@ const Repairs = () => {
   const [createOpen, setCreateOpen] = useState(false);
   const [createForm, setCreateForm] = useState({
     manualOrderNumber: '',
+    clientName: '',
+    clientPhone: '',
+    clientAddress: '',
     contactedAt: '',
     problem: '',
     estimatedWorkDays: 1,
@@ -22,6 +25,7 @@ const Repairs = () => {
   });
   const [createFiles, setCreateFiles] = useState([]);
   const [creating, setCreating] = useState(false);
+  const [orderSuggestion, setOrderSuggestion] = useState(null);
 
   const [selected, setSelected] = useState(null);
   const [noteText, setNoteText] = useState('');
@@ -50,9 +54,33 @@ const Repairs = () => {
     fetchRepairs();
   }, [fetchRepairs]);
 
+  const lookupOrder = async (orderNumber) => {
+    if (!orderNumber || orderNumber.trim().length === 0) {
+      setOrderSuggestion(null);
+      return;
+    }
+    try {
+      const res = await axios.get(`${API_URL}/orders`, config);
+      const order = res.data.find(o => o.manualOrderNumber === orderNumber.trim());
+      if (order) {
+        setOrderSuggestion({
+          clientName: order.clientName || '',
+          clientPhone: order.clientPhone || '',
+          clientAddress: order.clientAddress || '',
+          region: order.region || ''
+        });
+      } else {
+        setOrderSuggestion(null);
+      }
+    } catch (e) {
+      console.error(e);
+      setOrderSuggestion(null);
+    }
+  };
+
   const createRepair = async () => {
-    if (!createForm.manualOrderNumber.trim() || !createForm.problem.trim()) {
-      alert(`${t('order_col')} and ${t('problem').toLowerCase()} are required`);
+    if (!createForm.manualOrderNumber.trim() || !createForm.problem.trim() || !createForm.clientName.trim()) {
+      alert(`${t('order_col')}, ${t('client_name')} and ${t('problem').toLowerCase()} are required`);
       return;
     }
     try {
@@ -60,6 +88,10 @@ const Repairs = () => {
       const contactedAt = createForm.contactedAt || new Date().toISOString().slice(0, 10);
       const created = await axios.post(`${API_URL}/repairs`, {
         manualOrderNumber: createForm.manualOrderNumber.trim(),
+        clientName: createForm.clientName.trim(),
+        clientPhone: createForm.clientPhone.trim(),
+        clientAddress: createForm.clientAddress.trim(),
+        region: createForm.region || '',
         contactedAt,
         problem: createForm.problem.trim(),
         estimatedWorkDays: Number(createForm.estimatedWorkDays) || 1,
@@ -87,8 +119,9 @@ const Repairs = () => {
       }
 
       setCreateOpen(false);
-      setCreateForm({ manualOrderNumber: '', contactedAt: '', problem: '', estimatedWorkDays: 1, warrantyStatus: 'in_warranty', paymentNote: '' });
+      setCreateForm({ manualOrderNumber: '', clientName: '', clientPhone: '', clientAddress: '', contactedAt: '', problem: '', estimatedWorkDays: 1, warrantyStatus: 'in_warranty', paymentNote: '' });
       setCreateFiles([]);
+      setOrderSuggestion(null);
       setCreating(false);
       fetchRepairs();
     } catch (e) {
@@ -317,10 +350,49 @@ const Repairs = () => {
                 <label className="text-xs text-slate-400 block mb-1">{t('order_col')}</label>
                 <input
                   value={createForm.manualOrderNumber}
-                  onChange={(e) => setCreateForm((p) => ({ ...p, manualOrderNumber: e.target.value }))}
+                  onChange={(e) => {
+                    setCreateForm((p) => ({ ...p, manualOrderNumber: e.target.value }));
+                    lookupOrder(e.target.value);
+                  }}
                   className="w-full bg-slate-800 border border-slate-600 rounded-lg p-2 text-white"
                   placeholder="e.g. 2024-100"
                 />
+                {orderSuggestion && (
+                  <div className="mt-2 p-2 bg-blue-900/20 border border-blue-700/50 rounded-lg text-xs text-blue-200">
+                    {t('order_found_suggestion')}: {orderSuggestion.clientName} ({orderSuggestion.clientPhone})
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="text-xs text-slate-400 block mb-1">{t('client_name')} *</label>
+                <input
+                  value={createForm.clientName}
+                  onChange={(e) => setCreateForm((p) => ({ ...p, clientName: e.target.value }))}
+                  className="w-full bg-slate-800 border border-slate-600 rounded-lg p-2 text-white"
+                  placeholder={t('client_name')}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-slate-400 block mb-1">{t('phone')}</label>
+                  <input
+                    value={createForm.clientPhone}
+                    onChange={(e) => setCreateForm((p) => ({ ...p, clientPhone: e.target.value }))}
+                    className="w-full bg-slate-800 border border-slate-600 rounded-lg p-2 text-white"
+                    placeholder={t('phone')}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-slate-400 block mb-1">{t('address')}</label>
+                  <input
+                    value={createForm.clientAddress}
+                    onChange={(e) => setCreateForm((p) => ({ ...p, clientAddress: e.target.value }))}
+                    className="w-full bg-slate-800 border border-slate-600 rounded-lg p-2 text-white"
+                    placeholder={t('address')}
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">

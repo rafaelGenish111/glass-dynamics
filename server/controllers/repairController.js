@@ -2,7 +2,7 @@ const Repair = require('../models/Repair');
 const Order = require('../models/Order');
 
 exports.createRepair = async (req, res) => {
-  const { manualOrderNumber, contactedAt, problem, estimatedWorkDays, warrantyStatus, paymentNote } = req.body;
+  const { manualOrderNumber, contactedAt, problem, estimatedWorkDays, warrantyStatus, paymentNote, clientName, clientPhone, clientAddress, region } = req.body;
   const userName = req.user ? req.user.name : 'System';
 
   try {
@@ -12,6 +12,9 @@ exports.createRepair = async (req, res) => {
     if (!problem || !String(problem).trim()) {
       return res.status(400).json({ message: 'Problem is required' });
     }
+    if (!clientName || !String(clientName).trim()) {
+      return res.status(400).json({ message: 'Client name is required' });
+    }
 
     const dt = contactedAt ? new Date(contactedAt) : new Date();
     if (Number.isNaN(dt.getTime())) {
@@ -19,15 +22,14 @@ exports.createRepair = async (req, res) => {
     }
 
     const order = await Order.findOne({ manualOrderNumber: String(manualOrderNumber).trim() });
-    if (!order) return res.status(404).json({ message: 'Order not found' });
-
+    
     const repair = new Repair({
-      orderId: order._id,
-      manualOrderNumber: order.manualOrderNumber,
-      clientName: order.clientName,
-      clientPhone: order.clientPhone,
-      clientAddress: order.clientAddress,
-      region: order.region,
+      orderId: order ? order._id : null,
+      manualOrderNumber: String(manualOrderNumber).trim(),
+      clientName: String(clientName).trim(),
+      clientPhone: clientPhone ? String(clientPhone).trim() : '',
+      clientAddress: clientAddress ? String(clientAddress).trim() : '',
+      region: region ? String(region).trim() : '',
       contactedAt: dt,
       problem: String(problem).trim(),
       warrantyStatus: warrantyStatus === 'out_of_warranty' ? 'out_of_warranty' : 'in_warranty',
@@ -237,5 +239,6 @@ exports.updateRepairIssue = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 

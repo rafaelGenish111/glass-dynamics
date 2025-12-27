@@ -37,15 +37,11 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
     const [clientSuggestions, setClientSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
 
-    // Master plan upload (image or PDF)
+    // Master plan upload (PDF only)
     const [masterPlanFile, setMasterPlanFile] = useState(null);
     const masterPlanPreviewUrl = useMemo(() => {
         if (!masterPlanFile) return '';
         return URL.createObjectURL(masterPlanFile);
-    }, [masterPlanFile]);
-    
-    const isPDF = useMemo(() => {
-        return masterPlanFile?.type === 'application/pdf';
     }, [masterPlanFile]);
 
     // --- LOAD DATA ---
@@ -81,13 +77,10 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
     };
 
     const selectClient = (client) => {
+        // Only set the client name, don't auto-fill other fields
         setFormData({
             ...formData,
-            clientName: client._id,
-            clientPhone: client.phone || '',
-            clientEmail: client.email || '',
-            clientAddress: client.address || '',
-            region: client.region || ''
+            clientName: client._id
         });
         setShowSuggestions(false);
     };
@@ -281,33 +274,37 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
                         <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                             <label className="block w-full bg-slate-800 border-2 border-dashed border-slate-600 hover:border-indigo-500 text-slate-300 py-3 rounded-xl text-center cursor-pointer transition">
                                 <span className="font-bold">{t('new_upload_plan')}</span>
-                                <div className="text-xs text-slate-400 mt-1">{t('file_formats')}</div>
+                                <div className="text-xs text-slate-400 mt-1">PDF only</div>
                                 <input
                                     type="file"
-                                    accept="image/*,application/pdf"
+                                    accept="application/pdf"
                                     className="hidden"
-                                    onChange={(e) => setMasterPlanFile(e.target.files?.[0] || null)}
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file && file.type !== 'application/pdf') {
+                                            alert('Only PDF files are allowed for master plan');
+                                            e.target.value = '';
+                                            return;
+                                        }
+                                        setMasterPlanFile(file || null);
+                                    }}
                                 />
                             </label>
 
-                            {masterPlanPreviewUrl ? (
+                            {masterPlanPreviewUrl && masterPlanFile ? (
                                 <div className="rounded-xl overflow-hidden border border-slate-700 bg-black/30">
-                                    {isPDF ? (
-                                        <div className="w-full h-48 bg-black flex flex-col items-center justify-center">
-                                            <FileText className="text-indigo-400 mb-2" size={48} />
-                                            <span className="text-sm text-slate-300 mb-2">{masterPlanFile?.name}</span>
-                                            <a
-                                                href={masterPlanPreviewUrl}
-                                                target="_blank"
-                                                rel="noreferrer"
-                                                className="text-xs text-indigo-400 hover:text-indigo-300 inline-flex items-center gap-1"
-                                            >
-                                                {t('preview')} <ExternalLink size={12} />
-                                            </a>
-                                        </div>
-                                    ) : (
-                                        <img src={masterPlanPreviewUrl} alt="Master plan preview" className="w-full h-48 object-contain bg-black" />
-                                    )}
+                                    <div className="w-full h-48 bg-black flex flex-col items-center justify-center">
+                                        <FileText className="text-indigo-400 mb-2" size={48} />
+                                        <span className="text-sm text-slate-300 mb-2">{masterPlanFile?.name}</span>
+                                        <a
+                                            href={masterPlanPreviewUrl}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="text-xs text-indigo-400 hover:text-indigo-300 inline-flex items-center gap-1"
+                                        >
+                                            {t('preview')} <ExternalLink size={12} />
+                                        </a>
+                                    </div>
                                     <div className="p-2 text-xs text-slate-400 flex items-center justify-between">
                                         <span className="truncate">{masterPlanFile?.name}</span>
                                         <button
