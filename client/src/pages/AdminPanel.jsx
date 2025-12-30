@@ -213,9 +213,9 @@ const AdminPanel = () => {
                                         </td>
                                         <td className="p-4">
                                             <div className="flex items-center gap-2 justify-end">
-                                                <button onClick={() => openEditModal(u)} className="bg-slate-800 p-2 rounded-lg hover:bg-blue-600 hover:text-white transition border border-slate-700">
-                                                    <Edit2 size={16} />
-                                                </button>
+                                            <button onClick={() => openEditModal(u)} className="bg-slate-800 p-2 rounded-lg hover:bg-blue-600 hover:text-white transition border border-slate-700">
+                                                <Edit2 size={16} />
+                                            </button>
                                                 <button onClick={() => setDeletingUser(u)} className="bg-slate-800 p-2 rounded-lg hover:bg-red-600 hover:text-white transition border border-slate-700">
                                                     <Trash2 size={16} />
                                                 </button>

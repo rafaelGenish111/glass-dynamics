@@ -115,7 +115,12 @@ const ClientCard = () => {
     formData.append('image', file);
 
     try {
-      const uploadRes = await axios.post(`${API_URL}/upload`, formData);
+      const uploadRes = await axios.post(`${API_URL}/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`
+        }
+      });
       await axios.put(`${API_URL}/orders/${id}/files`, {
         url: uploadRes.data.url,
         type: type,
@@ -126,8 +131,9 @@ const ClientCard = () => {
       alert(type === 'master_plan' ? t('plan_updated') : t('file_uploaded'));
       fetchOrder();
     } catch (error) {
-      console.error(error);
-      alert(t('upload_error'));
+      console.error('Upload error:', error);
+      const errorMessage = error.response?.data?.message || error.message || t('upload_error');
+      alert(errorMessage);
       setUploadingType(null);
     }
   };

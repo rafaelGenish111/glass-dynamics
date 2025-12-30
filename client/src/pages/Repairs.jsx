@@ -104,7 +104,12 @@ const Repairs = () => {
         for (const file of createFiles) {
           const fd = new FormData();
           fd.append('image', file);
-          const uploadRes = await axios.post(`${API_URL}/upload`, fd);
+          const uploadRes = await axios.post(`${API_URL}/upload`, fd, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              'Authorization': `Bearer ${token}`
+            }
+          });
 
           const isVideo = file.type.startsWith('video/');
           const isPdf = file.type === 'application/pdf';
@@ -174,7 +179,12 @@ const Repairs = () => {
     fd.append('image', file);
 
     try {
-      const uploadRes = await axios.post(`${API_URL}/upload`, fd);
+      const uploadRes = await axios.post(`${API_URL}/upload`, fd, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`
+        }
+      });
       const isVideo = file.type.startsWith('video/');
       const isPdf = file.type === 'application/pdf';
       await axios.post(`${API_URL}/repairs/${selected._id}/media`, {

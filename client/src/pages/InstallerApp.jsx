@@ -101,7 +101,12 @@ const InstallerApp = () => {
         const formData = new FormData();
         formData.append('image', file);
         try {
-            const uploadRes = await axios.post(`${API_URL}/upload`, formData);
+            const uploadRes = await axios.post(`${API_URL}/upload`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             if (job.__type === 'repair') {
                 await axios.post(`${API_URL}/repairs/${job._id}/media`, {
                     url: uploadRes.data.url,
@@ -119,8 +124,9 @@ const InstallerApp = () => {
             setUploadingId(null);
             fetchJobs();
         } catch (e) {
-            console.error(e);
-            alert('Upload failed');
+            console.error('Upload error:', e);
+            const errorMessage = e.response?.data?.message || e.message || 'Upload failed';
+            alert(errorMessage);
             setUploadingId(null);
         }
     };

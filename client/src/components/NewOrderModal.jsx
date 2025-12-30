@@ -121,15 +121,21 @@ const NewOrderModal = ({ onClose, onSuccess }) => {
                 try {
                     const fd = new FormData();
                     fd.append('image', masterPlanFile);
-                    const uploadRes = await axios.post(`${API_URL}/upload`, fd);
+                    const uploadRes = await axios.post(`${API_URL}/upload`, fd, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
                     await axios.put(`${API_URL}/orders/${orderId}/files`, {
                         url: uploadRes.data.url,
                         type: 'master_plan',
                         name: masterPlanFile.name || 'Master plan'
                     }, config);
                 } catch (e) {
-                    console.error(e);
-                    alert(t('order_created_plan_failed'));
+                    console.error('Upload error:', e);
+                    const errorMessage = e.response?.data?.message || e.message || t('order_created_plan_failed');
+                    alert(errorMessage);
                 }
             }
 
