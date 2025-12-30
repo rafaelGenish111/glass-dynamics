@@ -67,10 +67,8 @@ exports.loginUser = async (req, res) => {
 exports.createUser = async (req, res) => {
   const { name, email, password, role, language, phone } = req.body;
 
-  // Extra protection: only super_admin can create other admins or super_admins
-  if ((role === 'admin' || role === 'super_admin') && req.user.role !== 'super_admin') {
-    return res.status(403).json({ message: 'Only Super Admin can create other Admins' });
-  }
+  // Both admin and super_admin can create users with any role
+  // No additional restrictions needed
 
   try {
     const userExists = await User.findOne({ email });

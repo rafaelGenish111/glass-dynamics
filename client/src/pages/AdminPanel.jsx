@@ -158,7 +158,8 @@ const AdminPanel = () => {
                                         <option value="installer">{t('role_installer')}</option>
                                         <option value="production">{t('role_production')}</option>
                                         <option value="office">{t('role_office')}</option>
-                                        <option value="admin">{t('role_super_admin')}</option>
+                                        <option value="admin">{t('role_admin')}</option>
+                                        <option value="super_admin">{t('role_super_admin')}</option>
                                     </select>
                                 </div>
                                 <div>
@@ -281,7 +282,8 @@ const AdminPanel = () => {
                                         <option value="installer">{t('role_installer')}</option>
                                         <option value="production">{t('role_production')}</option>
                                         <option value="office">{t('role_office')}</option>
-                                        <option value="admin">{t('role_super_admin')}</option>
+                                        <option value="admin">{t('role_admin')}</option>
+                                        <option value="super_admin">{t('role_super_admin')}</option>
                                     </select>
                                 </div>
                                 <div>
